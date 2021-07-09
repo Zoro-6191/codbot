@@ -1,0 +1,15 @@
+{
+    "botname": "CODBot",
+    "botprefix": "[CB]",
+    "time_zone": "IST",
+    "db_host": "",
+    "db_user": "",
+    "db_pass": "",
+    "db_name": "",
+    "rcon_password": "",
+    "rcon_ip": "127.0.0.1",
+    "public_ip": "",
+    "port": "28960",
+    "logpath": "",
+    "pluginpath": ""
+}

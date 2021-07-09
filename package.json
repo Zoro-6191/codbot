@@ -1,0 +1,23 @@
+{
+  "name": "codbot",
+  "version": "1.0.0",
+  "description": "\"B3 Replacement\"",
+  "main": "run.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zoro-6191/codbot.git"
+  },
+  "author": "Zoro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Zoro-6191/codbot/issues"
+  },
+  "homepage": "https://github.com/Zoro-6191/codbot#readme",
+  "dependencies": {
+    "@arbytez/cod4-rcon-commands": "^0.1.1",
+    "tail": "^2.2.3"
+  }
+}
