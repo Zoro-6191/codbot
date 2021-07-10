@@ -1,5 +1,8 @@
 // this line initiates our bot
 const logread = require("./logread.js")
+const db = require('./db')
+require('colors')
+const { player } = require('./eventhandler')
 // TO-DO: CLI args?
 
 // =================================================
@@ -10,4 +13,14 @@ const logread = require("./logread.js")
 // =================================================
 
 // PART 1: start stream
-logread.init()
+db.init()   // connect to mysql database
+logread.init()  // begin reading logfile
+
+player.on('connect', ( guid, slot, name )=>{
+    console.log(`=========================`)
+    console.log(`Player Connected:`)
+    console.log(`Name: ${name}`)
+    console.log(`GUID: ${guid}`)
+    console.log(`Slot: ${slot}`)
+    console.log(`=========================`)
+})

@@ -1,6 +1,8 @@
 // this file parses each line and makes use outta em
 // events appear to be the best option for independent and togglable plugins
 
+const { player, server } = require('./eventhandler')
+
 module.exports = 
 {
     parseLine
@@ -10,7 +12,7 @@ async function parseLine( line )
 {
     // types of lines to process:
     // 0.00 = minutes and seconds from server start, probably
-    // 0.00 -----------------------             // on round start
+    // 0.00 -----------------------             // idk
     // 0.00 InitGame: \fs_game\mods/...              // big ass line, but contains good amounta info
     // 0.00 J;<guid>;<slot>;<name>                   // player connect
     // 0.00 Q;<guid>;<slot>;<name>                   // player disconnect
@@ -20,10 +22,90 @@ async function parseLine( line )
     // 0.00 P_D;<guid>;<slot>;<name>                 // player defuse
     // 0.00 say;<guid>;<slot>;<name>;<text>         // saytext wihtout quotes
     // 0.00 sayteam;<guid>;<slot>;<name>;<text>    // say team text wihtout quotes
-    // 0.00 Weapon;<guid>;<slot>;<name>;<weapon>    // most probably pickup log. could be drop log too.
-    // 0.00 ExitLevel: executed                      // no idea yet, probably no need to process it
+    // 0.00 Weapon;<guid>;<slot>;<name>;<weapon>    // weap pickup log
+    // 0.00 ExitLevel: executed                      // exitlevel called, basically endmap
 
+    // trim() = remove extra white spaces from start and end
+    // split(" ") = create an array outta sentence diff by " "
+    // slice(1) = remove 1st element of that array  // shift() malfunctioned
+    // join(" ") = join the array and remake it a string, separated by " ". we need the space in case player name has space
     line = line.trim().split(" ").slice(1).join(" ")    // remove timestamp coz no need
+    
+    // J;<guid>;<slot>;<name>                   // player connect
+    // [ 'J', '273546t762', 8, 'optical prime' ]
 
-    console.log(line)
+    if( line.startsWith('InitGame') || line.startsWith('ExitLevel') || line.startsWith('--'))
+        processServerLines(line)
+    else
+    {
+        line = line.split(";")
+
+        // TO-DO: check correctness of all linesubstr elements
+
+        // luckily first letter is diff in every case, could just do switch
+        
+        switch( line[0] )
+        {
+            case 'J':
+                // event: connect, guid, slot, name
+                player.emit( 'connect', line[1], line[2], line[3] )
+                return;
+
+            case 'Q':
+                // event: disconnect, guid, slot, name
+                player.emit( 'disconnect', line[1], line[2], line[3] )
+                return;
+
+            case 'D':
+                // event: damage, guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
+                player.emit( 'damage', line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
+                return;
+            
+            case 'K':
+                // event: kill, guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
+                player.emit( 'kill', line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
+                return;
+
+            case 'say':
+            case 'sayteam':
+                processChat( line )
+                return;
+
+            case 'P_P':
+                player.emit( 'plant', line[1], line[2], line[3] )
+                return;
+
+            case 'P_D':
+                player.emit( 'defuse', line[1], line[2], line[3] )
+                return;
+
+            case 'Weapon':
+                player.emit( 'weapPick', line[1], line[2], line[3], line[4] )
+                return;
+        }
+    }
+}
+
+async function processChat( line )
+{
+    // need to append chat line in case it contains ";"
+    if( line.length > 5 )
+    line[4] = line.slice(4).join(';')
+
+    // emit event. line[0] could only be either 'say' or 'sayteam' so its safe to do this
+    player.emit( line[0], line[1], line[2], line[3], line[4] )
+
+    // and an event which includes both say and sayteam for shit like commands
+    player.emit( 'say/sayteam', line[1], line[2], line[3], line[4] )
+}
+
+processServerLines(line)
+{
+    if(line.startsWith('InitGame'))
+    {
+        server.emit( 'roundstart' )
+        server.emit( 'initgame', line )
+    }
+    else if( line.startsWith('ExitLevel') )
+        server.emit( 'endmap' )
 }
