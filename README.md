@@ -11,7 +11,7 @@ Codbot is a bot which works similar to [BigBrotherBot](https://github.com/BigBro
 - Permission to read logfile locally available
 
 # How to Install (Linux)
-- Install Git, Screen and Latest NodeJS:
+- Install Git and Latest NodeJS:
     ```
     sudo apt update
 
