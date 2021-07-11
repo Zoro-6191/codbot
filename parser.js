@@ -58,11 +58,13 @@ async function parseLine( line )
 
             case 'D':
                 // event: damage, guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
+                // TO-DO: emit suicide event
                 player.emit( 'damage', line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
                 return;
             
             case 'K':
                 // event: kill, guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
+                // TO-DO: emit tk event
                 player.emit( 'kill', line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
                 return;
 
