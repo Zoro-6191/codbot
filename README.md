@@ -12,21 +12,34 @@ Codbot is a bot which works similar to [BigBrotherBot](https://github.com/BigBro
 
 # How to Install (Linux)
 - Install Git, Screen and Latest NodeJS:
-    `sudo apt update
+    ```
+    sudo apt update
+
     sudo apt-get -y install git curl dirmngr apt-transport-https lsb-release ca-certificates
+
     curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+
     sudo apt-get -y install nodejs
-    sudo apt-get update`
+
+    sudo apt-get update
+    ```
 - Clone Repository and Navigate to it:
-    `git clone "https://github.com/Zoro-6191/codbot"
-    cd codbot`
+    ```
+    git clone "https://github.com/Zoro-6191/codbot"
+
+    cd codbot
+    ```
 - Install and Update all Dependancies:
-    `npm install
-    npm update`
+    ```
+    npm install
+    npm update
+    ```
 
 # Configure
 - Navigate to _conf_ folder. Every file with extension `.ini` is configurable, and is pretty explainatory.
 
 # Run
 - Navigate to repository path, and type this in console:
-    `node run.js`
+    ```
+    node run.js
+    ```
