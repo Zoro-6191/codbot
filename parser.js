@@ -42,7 +42,7 @@ async function parseLine( line )
 
         // TO-DO: check correctness of all linesubstr elements
 
-        // luckily first letter is diff in every case, could just do switch
+        // luckily first word/alphabet is diff in every case, could just do switch
         
         switch( line[0] )
         {

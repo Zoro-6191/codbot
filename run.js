@@ -1,26 +1,22 @@
-// this line initiates our bot
+// this file initiates our bot
 const logread = require("./logread.js")
-const db = require('./db')
+const db = require('./db.js')
+const config = require('./conf')
+const rcon = require('./rcon.js')
 require('colors')
 const { player } = require('./eventhandler')
 // TO-DO: CLI args?
 
 // =================================================
-// create read stream
-// connect to mysql db and keep it alive
-// analyze each line and store in perm vars/emit events for it
+// create read stream - done
+// setup general rcon use - done
+// connect to mysql db and keep it alive - done
+// analyze each line and emit events for it - done
 // create a standard for the plugins
+// create a standard for commands
 // =================================================
 
-// PART 1: start stream
+config.init()   // read all configurations
+rcon.init()    // create UDP socket for rcon
 db.init()   // connect to mysql database
 logread.init()  // begin reading logfile
-
-player.on('connect', ( guid, slot, name )=>{
-    console.log(`=========================`)
-    console.log(`Player Connected:`)
-    console.log(`Name: ${name}`)
-    console.log(`GUID: ${guid}`)
-    console.log(`Slot: ${slot}`)
-    console.log(`=========================`)
-})
