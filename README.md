@@ -19,7 +19,7 @@ Codbot is a bot which works similar to [BigBrotherBot](https://github.com/BigBro
     sudo apt-get update`
 - Clone Repository and Navigate to it:
     `git clone "https://github.com/Zoro-6191/codbot"
-    cd codbot"
+    cd codbot`
 - Install and Update all Dependancies:
     `npm install
     npm update`
