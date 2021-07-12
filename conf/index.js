@@ -1,16 +1,26 @@
 // this file reads all configs (.ini) and then convert them into smart objects
 const fs = require('fs')
-const ini = require('ini')
+const cjson = require('comment-json')
+
+const eventhandler = require('../eventhandler')
 
 module.exports = 
 {
     init
 }
 
-async function init()
+function init()
 {
-    const mainconfig = ini.parse(fs.readFileSync('./codbot.ini', 'utf-8'))
-    module.exports.mainconfig = mainconfig
+    // console.log("Initializing Config")
+    const mainconfig = cjson.parse(fs.readFileSync('./conf/codbot.json').toString())
+    this.mainconfig = mainconfig
 
+    // console.log( mainconfig )
+    // console.log( mainconfig.mysqldb )
+    // console.log( mainconfig.mysqldb.host )
+    
     // read all other .ini separately and store them in a smart way somehow.
+    eventhandler.bot.emit('conf_ready')
+
+    // console.log("Initializing Config Complete")
 }

@@ -1,7 +1,7 @@
 // this file reads each line from the log
 const { Tail } = require('tail')
 const parser = require('./parser.js')
-const { logpath } = require('./config.json')
+const conf = require('./conf')
 
 module.exports = 
 {
@@ -11,7 +11,8 @@ module.exports =
 async function init()
 {
     console.log('Starting Tail')
-    tail = new Tail( logpath )
+    console.log( conf.mainconfig.server )
+    tail = new Tail( conf.mainconfig.server.logfile )
 
     tail.on('line', (data)=>{
         // console.log(data)

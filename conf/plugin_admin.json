@@ -1,0 +1,349 @@
+// ==== GROUPS: ============
+// 0 - Guest
+// 1 - User
+// 2 - Regular
+// 20 - Moderator
+// 40 - Admin
+// 60 - Fulladmin
+// 80 - Senioradmin
+// 100 - Superadmin
+// ===================
+
+{
+    "settings": {
+        "noreason_level": 100, // admin from this level are not required to specify a reason when giving penalties to players
+        "long_tempban_level": 100,  // admin level required to be able to issue bans longer than long_tempban_max_duration
+        "long_tempban_max_duration": "3h", // maximum ban duration that can be inflicted by admin of level below long_tempban_level
+        "admins_level": 20,  // minimum level for groups to consider as admins
+        "ban_duration": "15d",  // tempban duration to apply to the !ban and !banall commands
+        "announce_registration": true,  // show a message to all users when a user registered himself. Encourages other Users to register too. - use true or false
+        "past_bans_check_rate:": 10,  // show a message to all users when a user registered himself. Encourages other Users to register too. - use true or false
+        "warn": {
+            "pm_global": false,     // determines whether the warning is sent to the the whole server (true), or just the player and admin (false), to reduce chatbox spam.
+            "alert_kick_num": 3,    // if a player reach this number of active warnings he will be notified by with message then tempbanned
+            "instant_kick_num": 5,  // if a player reach this number of active warnings he will be tempbanned right away
+            "tempban_num": 6,    // when the number of warnings goes over this limit, the player is tempban for tempban_duration
+            "tempban_duration": "2h",   // for how long to tempban a players whose number of warning exceeded tempban_num
+            "max_duration": "3h", // when the bot decides to tempban (warning exceeding alert_kick_num) the ban duration is
+                                  // computed from the duration of each of the active warnings but will never exceed max_duration
+            "warn_delay": 15,   // a given player can only be given one warning every warn_delay seconds
+            "duration_divider": 30, // tempbanned duration is computed from the sum of all active warnings durations divided by duration_divider
+            "warn_command_abusers": false   // warn players who try invalid/no permission commands
+        }
+    },
+    "commands": {
+        // level required for command usage:
+        "putgroup": 100,
+        "ungroup": 100,
+        "runas": 100,
+        "makereg": 100,
+        "unreg": 100,
+        "banall": 100,
+        "kickall": 100,
+
+        "clientinfo": 80,
+        "mask": 80,
+        "unmask": 80,
+        "permban": 80,
+        "map": 80,
+        "maprotate": 80,
+        "warnclear": 80,
+        "clear": 80,
+        "lookup": 80,
+        "unban": 80,
+
+        "ban": 60,     // not permanent ban
+        "tempban": 60,
+        "kick": 60,
+
+        "baninfo": 40,
+        "lastbans": 40,
+        "admintest": 40,
+        "scream": 40,
+        "notice": 40,
+
+        "find": 20,
+        "aliases": 20,
+        "warns": 20,
+        "warninfo": 20,
+        "warnremove": 20,
+        "warn": 20,
+        "warntest": 20,
+        "spams": 20,
+        "spam": 20,
+        "list": 20,
+        "admins": 20,
+        "say": 20,
+        "status": 20,
+        "leveltest": 20,
+        "poke": 20,
+        "codbot": 20,
+
+        "seen": 2,
+        "maps": 2,
+
+        "getss": 1,
+        "nextmap": 1,
+        "regulars": 1,
+        "regtest": 1,
+        "time": 1,
+
+        "help": 0,
+        "register": 0,
+        "rules": 0
+    },
+    // assign aliases to commands, can't be more than 1
+    "commandalias": {
+        "admins": "ad",
+        "ban": "b",
+        "aliases": "aa",
+        "codbot": "b3",
+        "clear": "clearall",
+        "getss": "ss",
+        "help": "h",
+        "kick": "k",
+        "leveltest": "lt",
+        "lookup": "l",
+        "makereg": "mr",
+        "maprotate": "map_rotate",
+        "permban": "pb",
+        "putgroup": "pg",
+        "regulars": "regs",
+        "rules": "r",
+        "runas": "su",
+        "tempban": "tb",
+        "warn": "w",
+        "warnclear": "wc",
+        "warnremove": "wr"
+    },
+    // what to display when player types !help <command> ?
+    "commandhelp": {
+        "admins": "Get a list of admins",
+        "admintest": "Test your/player's adminship",
+        "aliases": "Get a list of aliases of player",
+        "ban": "Ban a player",
+        "banall": "Ban all online players, for some reason",
+        "baninfo": "Ban Info about any player",
+        "clear": "Clear all warnings for all players",
+        "clientinfo": "Get client info",
+        "codbot": "Get Bot version",
+        "find": "",
+        "getss": "Take a player's screenshot",
+        "help": "Get a list of available commands or about a specific command",
+        "kick": "Kick a player",
+        "kickall": "Kick all online players",
+        "lookup": "Lookup a player from database",
+        "lastbans": "Get a list of Latest Bans",
+        "leveltest": "Get player's level/group",
+        "list": "Get a List of Online Players",
+        "makereg": "Put a player in Regular group",
+        "map": "Change map",
+        "maprotate": "Change to next map in the pool",
+        "maps": "List of playable maps",
+        "mask": "Mask yourself/other player",
+        "nextmap": "Get Next Map",
+        "notice": "Notice a player's actions",
+        "permban": "Permanently Ban a player",
+        "poke": "Poke a player",
+        "putgroup": "Change player's group",
+        "register": "Register yourself for stats",
+        "regtest": "Test your/player's registration",
+        "regulars": "Get a list of regular players online",
+        "rules": "Get the list of Rules",
+        "runas": "Run a command as another player",
+        "say": "Say something in chat",
+        "scream": "Scream something in chat",
+        "seen": "Last seen of a player",
+        "spams": "",
+        "spam": "",
+        "status": "",
+        "tempban": "Temporarily Ban a Player",
+        "time": "Display Time",
+        "ungroup": "Remove someone from their group",
+        "unreg": "Un-register",
+        "unmask": "Un-mask yourself/other player",
+        "unban": "Unban a player",
+        "warn": "Warn a Player",
+        "warnclear": "Clear a player's warnings",
+        "warninfo": "Get status of a player's ongoing warnings",
+        "warnremove": "",
+        "warns": "Get player's warn count",
+        "warntest": "Test to see if you can warn a player"
+    },
+    "commandusage": {
+        "admins": "^7&prefix^7admins",
+        "admintest": "^7&prefix^7admintest ^7<player/@id>",
+        "aliases": "^7&prefix^7aa <player/@id>",
+        "ban": "^7&prefix^7ban <player/@id>",
+        "banall": "^7&prefix^7banall",
+        "baninfo": "^7&prefix^7baninfo <player/@id>",
+        "clear": "^7&prefix^7clear",
+        "clientinfo": "^7&prefix^7clientinfo <player/@id>",
+        "codbot": "^7&prefix^7codbot",
+        "find": "^7&prefix^7find",
+        "getss": "^7&prefix^7getss <player>",
+        "help": "^7&prefix^7help <command>",
+        "kick": "^7&prefix^7kick <player>",
+        "kickall": "^7&prefix^7kickall",
+        "lookup": "^7&prefix^7lookup <@id>",
+        "lastbans": "^7&prefix^7lastbans",
+        "leveltest": "^7&prefix^7leveltest <player/@id>",
+        "list": "^7&prefix^7list",
+        "makereg": "^7&prefix^7makereg <player/@id>",
+        "map": "^7&prefix^7map <map>",
+        "maprotate": "^7&prefix^7maprotate",
+        "maps": "^7&prefix^7maps",
+        "mask": "^7&prefix^7mask <level> <player/@id>",
+        "nextmap": "^7&prefix^7nextmap",
+        "notice": "^7&prefix^7notice <player/@id>",
+        "permban": "^7&prefix^7permban <player/@id>",
+        "poke": "^7&prefix^7poke <player>",
+        "putgroup": "^7&prefix^7putgroup <player/@id> <group>",
+        "register": "^7&prefix^7register",
+        "regtest": "^7&prefix^7regtest",
+        "regulars": "^7&prefix^7regulars",
+        "rules": "^7&prefix^7rules",
+        "runas": "^7&prefix^7runas <player> <command>",
+        "say": "^7&prefix^7say <text>",
+        "scream": "^7&prefix^7scream <text>",
+        "seen": "^7&prefix^7seen <@id>",
+        "spams": "^7&prefix^7spams",
+        "spam": "^7&prefix^7spam <text>",
+        "status": "^7&prefix^7status",
+        "tempban": "^7&prefix^7tempban <player/@id>",
+        "time": "^7&prefix^7time",
+        "ungroup": "^7&prefix^7ungroup <player/@id>",
+        "unreg": "^7&prefix^7unreg <player/@id>",
+        "unmask": "^7&prefix^7unmask <player/@id>",
+        "unban": "^7&prefix^7unban <@id>",
+        "warn": "^7&prefix^7warn <player/@id>",
+        "warnclear": "^7&prefix^7warnclear <player/@id>",
+        "warninfo": "^7&prefix^7warninfo <player/@id>",
+        "warnremove": "^7&prefix^7warnremove <player/@id>",
+        "warns": "^7&prefix^7warns <player/@id>",
+        "warntest": "^7&prefix^7warntest <player/@id>"
+    },
+    "messages": {
+        "cmd_err_unknown_cmd": "^7Unrecognized command ^1&cmd",
+        "cmd_err_invalidparams": "^7Invalid parameters",
+        "cmd_err_noaccess": "^7You need to be in group ^1&groupname ^7to use ^3&prefix^3&cmd",
+        "cmd_err_noreason": "^1ERROR: ^7No Reason Supplied",
+        "cmd_err_maskedhigherlevel": "^7&player ^7is a masked higher level player, action cancelled",
+        "cmd_err_no_players": "^7No players found matching &arg",
+        "cmd_err_ban_denied": "^7Can't ban ^1&player",
+        "cmd_err_plugin_disabled": "^7Cannot execute command. Plugin disabled",
+        "cmd_err_help_no_cmd": "^7Command not found ^3&cmd",
+        "cmd_err_temp_ban_self": "^7Can't ban yourself",
+        "cmd_err_kick_self": "^7Can't kick yourself",
+        "cmd_err_kick_denied": "Can't kick ^1&player",
+        "cmd_err_temp_ban_denied": "^7Can't temp ban ^1&player",
+        "cmd_err_warn_too_fast": "^7Only one warning per %(num_second)s seconds can be issued",
+        "cmd_err_warn_self": "^7Can't warn yourself",
+        "cmd_baninfo": "^7&player ^7has &numbans active ban(s)",
+        "cmd_baninfo_no_bans": "^7&player ^7has no active bans",
+        "cmd_group_unknown": "^7Group %(group_name)s does not exist",
+        "cmd_group_beyond_reach": "^7Group %(group_name)s is beyond your reach",
+        "cmd_cleared_warnings": "%(admin)s^7 has cleared %(player)s^7 of all tk-points and warnings",
+        "cmd_cleared_warnings_for_all": "%(admin)s^7 has cleared everyone's tk-points and warnings",
+        "cmd_help_available": "^7Available commands: %s",
+        "cmd_groups_in": "^7&player^7 is in groups &groups",
+        "cmd_say": "^7&player^7: &text",
+        "cmd_player_id": "^2&player ^7[^3&id^7]",
+        "cmd_seen": "^7&player ^7was last seen on ^2&lastseen",
+        "lookup_found": "^7[^2@&id^7] ^3&name^7 [^3%s^7]",
+        "groups_welcome": "^7You are now in group ^2&groupname",
+        "warn_denied": "^7&player^7 is a higher level admin, can't warn",
+        "groups_already_in": "^7&player^7 is already in group &groupname",
+        "players_matched": "^7Players matching %s %s",
+        "ban_self": "^7%s ^7Can't ban yourself",
+        "regme_confirmation": "^7Thanks for your registration. You are now in group ^7&groupname",
+        "regme_annouce": "^3&player ^7put in group ^2&groupname",
+        "groups_added": "^1&player ^7added to group ^2&groupname",
+        "groups_put": "^7&name ^7put in group &groupname",
+        "groups_none": "^7&name ^7is not in any groups",
+        "help_command": "^2%s%s ^7%s",
+        "regme_regged": "^7You are now in group ^2&groupname",
+        "help_none": "^7No Commands available for you",
+        "cmd_admins": "^7Admins online: ^7&admins",
+        "cmd_noadmin": "^7There are no admins online",
+        "cmd_regulars": "^7Regular players online: %s",
+        "cmd_no_regulars": "^7There are no regular players online",
+        "cmd_time": "Time: &time",
+        "cmd_leveltest": "^2&player ^7[^3@&id^7] is a ^3&groupname ^7[^2&group^7] since &since",
+        "leveltest_nogroups": "^7&player ^7[^3@&id^7] is not in any groups",
+        "cmd_aliases": "^7&player^7 aliases: ^7&aliases",
+        "cmd_aliases_moresuffix": "^7[^2and more^7]",
+        "cmd_noaliases": "^7&player^7 has no aliases",
+        "cmd_warningmsg": "^1WARNING^7 [^3&warnings^7]: &reason",
+        "reason_too_many_warnings": "^7too many warnings: &reason",
+        "warning_autokick_alert": "^1ALERT^7: &name^7 auto-kick from warnings if not cleared [^3&warnings^7] &reason"
+    },
+    // Define here shortcuts for warning reasons. Those shortcuts can be used with the !kick, !tempban, !ban, and !permban commands.
+    // The format of warning reasons can be of the form "<duration>, <message>". The duration defines how long such a warning will
+    // last before expiring. The message is what will be sent to the player.
+    // NOTE : in the message, you can make reference to an existing spammage shortcut by using the form '/spam#<spammage keyword>'
+    // NOTE2 : you can define warning shortcuts aliases if you don't use duration and the message is of the form '/<warn shortcut>'
+    "reasons": {
+        "generic": "1h, ^7",
+        "default": "1h, ^7behave yourself",
+
+        "rule1": "10d, /spam#rule1",
+        "rule2": "1d, /spam#rule2",
+        "rule3": "1d, /spam#rule3",
+        "rule4": "1d, /spam#rule4",
+        "rule5": "1h, /spam#rule5",
+        "rule6": "1d, /spam#rule6",
+        "rule7": "1d, /spam#rule7",
+        "rule8": "3d, /spam#rule8",
+        "rule9": "3h, /spam#rule9",
+        "rule10": "3d, /spam#rule10",
+
+        "lang": "/rule8",
+        "language": "/rule8",
+        "cuss": "/rule8",
+        "profanity": "/rule8",
+
+        "name": "/rule5",
+        "color": "1h, ^7No in-game (double caret (^)) color in names",
+        "badname": "1h, ^7No offensive, potentially offensive, or annoying names",
+        "spec": "/spectator",
+
+
+        "adv": "/rule7",
+        "racism": "/rule1",
+        "stack": "/rule2",
+        "recruit": "/rule6",
+        "argue": "/rule3",
+        "sfire": "/rule9",
+        "spawnfire": "/rule9",
+        "jerk": "/rule4",
+
+        "afk": "5m, ^7you appear to be away from your keyboard",
+        "tk": "1d, ^7stop team killing",
+        "obj": "1h, ^7go for the objective",
+        "camp": "1h, ^7stop camping or you will be kicked",
+        "fakecmd": "1h, ^7do not use fake commands",
+        "nocmd": "1h, ^7do not use commands that you do not have access to, try using !help",
+        "ci": "5m, ^7connection interupted, reconnect",
+        "spectator": "5m, ^7spectator too long on full server",
+        "spam": "1h, ^7do not spam, shut-up."
+    },
+    // You can define shortcuts to messages that can be used with the !spam command. Note if the message shortcut is of 
+    // the form 'rule#' where # is a number between 1 and 20, they will be used for the !rules command.	
+    "spamages": {
+        "join": "^3Join our Server by signing up on the forums at www.test.com",
+        "forum": "^3Visit our Server forums at www.test.com",
+        "stack": "^7No clan stacking, members must split evenly between the teams, go spectator and wait if you have to",
+
+        "rule1": "^3Rule #1: No racism of any kind",
+        "rule2": "^3Rule #2: No clan stacking, members must split evenly between the teams",
+        "rule3": "^3Rule #3: No arguing with admins (listen and learn or leave)",
+        "rule4": "^3Rule #4: No abusive language or behavior towards admins or other players",
+        "rule5": "^3Rule #5: No offensive or potentially offensive names, annoying names, or in-game (double caret (^)) color in names",
+        "rule6": "^3Rule #6: No recruiting for your clan, your server, or anything else",
+        "rule7": "^3Rule #7: No advertising or spamming of websites or servers",
+        "rule8": "^3Rule #8: No profanity or offensive language (in any language)",
+        "rule9": "^3Rule #9: Do ^1NOT ^3fire at teammates or within 10 seconds of spawning",
+        "rule10": "^3Rule #10: Offense players must play for the objective and support their team"
+    }
+}

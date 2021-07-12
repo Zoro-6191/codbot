@@ -1,11 +1,13 @@
 // this file takes care of mysql database and its connectivity to rest of the project
 const mysql = require('mysql')
-const { mysqldb } = require('./conf')
+const conf = require('./conf')
 
 module.exports = 
 {
 	init: function()
     {
+		mysqldb = conf.mainconfig.mysqldb
+		console.log(mysqldb)
 		this.connection = mysql.createConnection(
 		{
 			host: mysqldb.host,

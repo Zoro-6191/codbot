@@ -15,12 +15,24 @@ module.exports =
 
 async function init()
 {
-    // initEvents()
+    player.on( 'connect', onConnect( guid, slot, ign) )
+    player.on( 'disconnect', onDisconnect( guid, slot, ign) )
 }
 
-async function initEvents()
+async function onConnect( guid, slot, ign )
 {
-    player.on( 'connect', ( guid, slot, ign )=>{
+    // if new player
+    // create id, ip, connections, guid, name, group bits, time_add, time_edit in clients table
+    // 
 
-    })
+    // if not new player
+    // update IP in IP table and clients table
+    // update current_clients table?
+    // take old name from clients table and push it to aliases table, and update new name in clients table
+    // increment connections column in clients table
+}
+
+async function onDisconnect( guid, slot, ign )
+{
+    // update lastedit/lastseen?
 }

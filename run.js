@@ -3,8 +3,7 @@ const logread = require("./logread.js")
 const db = require('./db.js')
 const config = require('./conf')
 const rcon = require('./rcon.js')
-require('colors')
-const { player } = require('./eventhandler')
+const eventhandler = require('./eventhandler')
 // TO-DO: CLI args?
 
 // =================================================
@@ -16,7 +15,9 @@ const { player } = require('./eventhandler')
 // create a standard for commands
 // =================================================
 
+eventhandler.init()
 config.init()   // read all configurations
+
 rcon.init()    // create UDP socket for rcon
 db.init()   // connect to mysql database
 logread.init()  // begin reading logfile
