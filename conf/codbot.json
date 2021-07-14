@@ -1,10 +1,17 @@
 {
     // bot wide info
     "codbot": {
-        "prefix": "!",
-        "prefix_loud": "@",
+        "cmd_prefix": "!",
+        "cmd_prefix_loud": "@",
+        // As to be attached to all bot msgs sent. Although server sided prefix will also be there, which by default is "^2Server: ^7"
+        // to remove that, paste this in your server.cfg
+        //      seta sv_consayname ""
+        //      seta sv_contellname ""
+        // Alternatively, you can set "botprefix" setting to empty and use those above commands. Or you could use both
+        "botprefix": "^1[^3CODBOT^1]^7:",
         "timezone": "IST",
-        "logcommands": true // print commands initiated by everyone in console
+        // print commands initiated by everyone in console
+        "logcommands": true 
     },
     // database info
     "mysqldb": {
@@ -19,7 +26,7 @@
         "rcon_ip": "localhost",
         "port": 28960,
         "rcon_password": "rconpass",
-        "public_ip": "snr.vfesports.in",    // domain name works too
+        "public_ip": "snr.vfesports.in",    // domain name works too. eg: "143.110.191.162" or "snr.vfesports.in"
         "logfile": "H:/Games/Call of Duty Modern Warfare/mods/vf_snr_promod-ranked"    // bot cant work without proper logfile specification
     }
 }
