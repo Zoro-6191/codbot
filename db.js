@@ -18,8 +18,7 @@ module.exports =
 			database: mysqldb.database
 		});
 		this.keepAlive();
-		// console.log(`Initialized: MySQL Database`)
-		console.log(eventhandler)
+		console.log(`Initialized: MySQL Database`)
 	},
 	keepAlive: async function()
     {
