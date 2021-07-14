@@ -1,13 +1,14 @@
-// Groups are (keyword / level : description)
-// ==============================================
-// superadmin / 100 : Super admin (server owner)
-// senioradmin / 80 : Senior admins
-// fulladmin / 60   : Full admins
-// admin / 40       : Admins
-// mod / 20         : Moderators
-// reg / 2          : Regular players (VIP)
-// user / 1         : Registered players (those who typed !register)
-// guest / 0        : Unregistered players
+// ==== GROUPS: ============
+// <admin level> - <group name> (groupbits)     // you won't need to know groupbits in most scenarios
+// 0 - Guest (0)
+// 1 - User (1)
+// 2 - Regular (2)
+// 20 - Moderator (8)
+// 40 - Admin (16)
+// 60 - Fulladmin (32)
+// 80 - Senioradmin (64)
+// 100 - Superadmin (128)
+// ===================
 
 {
     "hit": {

@@ -8,6 +8,7 @@ module.exports =
 	initMySQLdb: function()
     {
 		const mainconfig = require('./conf').mainconfig
+		
 		mysqldb = mainconfig.mysqldb
 		this.connection = mysql.createConnection(
 		{

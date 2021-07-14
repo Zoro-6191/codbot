@@ -1,3 +1,14 @@
+// ==== GROUPS: ============
+// <admin level> - <group name> (groupbits)     // you won't need to know groupbits in most scenarios
+// 0 - Guest (0)
+// 1 - User (1)
+// 2 - Regular (2)
+// 20 - Moderator (8)
+// 40 - Admin (16)
+// 60 - Fulladmin (32)
+// 80 - Senioradmin (64)
+// 100 - Superadmin (128)
+// ===================
 {
     "settings": {
         // Choose which message will be sent on player connection.

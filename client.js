@@ -12,21 +12,21 @@ async function init()
     client = {} // for simplicity
 
     // get current players and update to client object
-    const rcon = require('./rcon')
-    const status = await rcon.rcon.status()
+    const { rcon } = require('./rcon')
+    const status = await rcon.rconStatus()
     const onlinePlayers = await status.onlinePlayers
  
     // console.log(onlinePlayers)
 
     for( i=0; i < onlinePlayers.length; i++ )
     {
-        var s = onlinePlayers[i].num    // we need slot num which is always unordered in 
-        updateClientInfo( s, "name", onlinePlayers[i].name )
-        updateClientInfo( s, "score", onlinePlayers[i].score )
-        updateClientInfo( s, "ping", onlinePlayers[i].ping )
-        updateClientInfo( s, "guid", onlinePlayers[i].id )
-        updateClientInfo( s, "steamid", onlinePlayers[i].steamId )
-        updateClientInfo( s, "ip", onlinePlayers[i].ip )
+        var slot = onlinePlayers[i].num    // we need slot num which is always unordered in 
+        updateClientInfo( slot, "name", onlinePlayers[i].name )
+        updateClientInfo( slot, "score", onlinePlayers[i].score )
+        updateClientInfo( slot, "ping", onlinePlayers[i].ping )
+        updateClientInfo( slot, "guid", onlinePlayers[i].id )
+        updateClientInfo( slot, "steamid", onlinePlayers[i].steamId )
+        updateClientInfo( slot, "ip", onlinePlayers[i].ip )
     }
     this.client = client    // now module.exports.client is an object containing info about our online players
 
@@ -36,7 +36,7 @@ async function init()
 
     // now we begin with events
     player.on( 'connect', ( guid, slot, ign ) => onConnect( guid, slot, ign ) )
-    player.on( 'disconnect', ( guid, slot, ign ) => onDisconnect( guid, slot, ign ) )
+    // player.on( 'disconnect', ( guid, slot, ign ) => onDisconnect( guid, slot, ign ) )
 }
 
 async function onConnect( guid, slot, ign )
@@ -46,10 +46,11 @@ async function onConnect( guid, slot, ign )
     updateClientInfo( slot, "name", ign )
     updateClientInfo( slot, "guid", guid ) 
 
-    const rcon = require('./rcon')
-    const onlinePlayers = await rcon.rcon.status().onlinePlayers
+    const { rcon } = require('./rcon')
+    const status = await rcon.rconStatus()
+    const onlinePlayers = await status.onlinePlayers
 
-    for( i=0; i < status.sv_maxclients; i++ )
+    for( i=0; i < onlinePlayers.length; i++ )
         if( onlinePlayers[i].num == slot )
         {
             updateClientInfo( slot, "score", onlinePlayers[i].score )
@@ -65,7 +66,18 @@ async function onConnect( guid, slot, ign )
 
 
     // from clients table
-    await db.connection.query(`SELECT * FROM clients WHERE guid=${guid}`, ( error, result ) => {
+    await db.connection.query(`
+        SELECT kills,
+                deaths,
+                assists,
+                teamkills,
+                teamdeaths,
+                suicides,
+                ratio,
+                skill
+        FROM xlr_playerstats
+        WHERE client_id=${ module.exports.client[toString(slot)].id }`, ( error, result ) => 
+    {
         if( error )
             console.error( error )  // can't skip this. bot has to shut down.
         if( result === undefined )  // nearly impossible
@@ -73,24 +85,6 @@ async function onConnect( guid, slot, ign )
             Query returned undefined when it should have returned atleast empty set in all possible cases. 
             Bot will Shut Down.`)
         // now result[0] cant be undefined coz event is 'connect' not 'firstconnect'
-        updateClientInfo( slot, "id", result[0].id )
-        updateClientInfo( slot, "noc", result[0].connections )
-        updateClientInfo( slot, "group_bits", result[0].group_bits )
-        updateClientInfo( slot, "mask_level", result[0].mask_level )
-        updateClientInfo( slot, "firstconnecttime", result[0].time_add )
-        updateClientInfo( slot, "time_edit", result[0].time_edit )
-        updateClientInfo( slot, "greeting", result[0].greeting )
-    })
-
-    // from xlr_playerstats table
-    await db.connection.query(`SELECT * FROM xlr_playerstats WHERE client_id=${ module.exports.client[toString(slot)].id }`, ( error, result ) => {
-        if( error )
-            console.error( error )  // can't skip this. bot has to shut down.
-        if( result === undefined )  // nearly impossible
-            console.error(`Unexpected error while Connect event in client.js. 
-            Query returned undefined when it should have returned atleast empty set in all possible cases. 
-            Bot will Shut Down.`)
-
         updateClientInfo( slot, "kills", result[0].kills )
         updateClientInfo( slot, "deaths", result[0].deaths )
         updateClientInfo( slot, "assists", result[0].assists )
@@ -99,10 +93,21 @@ async function onConnect( guid, slot, ign )
         updateClientInfo( slot, "suicides", result[0].suicides )
         updateClientInfo( slot, "ratio", result[0].ratio )
         updateClientInfo( slot, "skill", result[0].skill )
+
+        console.log( module.exports.client[toString(slot)])
     })
 }
 
 async function updateClientInfo( slot, str, value )
 {
+    if( module.exports.client == undefined )
+        module.exports.client = {}
+
+    if( module.exports.client[toString(slot)] == undefined )
+        module.exports.client[toString(slot)] = {}
+
+    if( slot == undefined || str == undefined || value == undefined )
+        return console.error(`Error in updateClientInfo(): one of the args was undefined.\nSLOT: ${slot}\nProperty: ${str}\nValue: ${value}`)
+
     module.exports.client[toString(slot)][str] = value
 }

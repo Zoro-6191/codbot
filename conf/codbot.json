@@ -1,6 +1,7 @@
 {
     // bot wide info
-    "codbot": {
+    "codbot": 
+    {
         "cmd_prefix": "!",
         "cmd_prefix_loud": "@",
         // As to be attached to all bot msgs sent. Although server sided prefix will also be there, which by default is "^2Server: ^7"
@@ -14,7 +15,8 @@
         "logcommands": true 
     },
     // database info
-    "mysqldb": {
+    "mysqldb": 
+    {
         "host": "localhost",
         "port": 3306,   // default: 3306
         "user": "root", // avoid root whenever possible
@@ -22,11 +24,12 @@
         "database": "codbot"
     },
     // cod4 server info
-    "server": {
+    "server": 
+    {
         "rcon_ip": "localhost",
         "port": 28960,
         "rcon_password": "rconpass",
         "public_ip": "snr.vfesports.in",    // domain name works too. eg: "143.110.191.162" or "snr.vfesports.in"
-        "logfile": "H:/Games/Call of Duty Modern Warfare/mods/vf_snr_promod-ranked"    // bot cant work without proper logfile specification
+        "logfile": "H:/Games/Call of Duty Modern Warfare/mods/vf_snr_promod-ranked/games_mp.log"    // bot cant work without proper logfile specification
     }
 }
