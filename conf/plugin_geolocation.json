@@ -1,0 +1,84 @@
+{
+    "settings": {
+        // Choose which message will be sent on player connection.
+        // pm_ messages are sent privately while global_ are public.
+        // Expected values : true/false, without quotes.
+        "pm_first": true,
+        "pm_newb": true,
+        "pm_user": true,
+        "global_first": true,
+        "global_user": true,
+        "show_user_greeting": true,     // show greeting set by user using !greeting command
+        "global_location_onconnect": true, // whether to announce the client location on connect [default = true] ( location.py )
+
+        // Maximum number of connections a user has to be consider
+        // a newb for the newb message
+        "newb_connections": 10,
+
+        // seconds after connection to display the message.
+        // Accepted range: 15-90
+        "delay": 15,
+
+        // seconds the bot must wait before welcoming a player again.
+        // i.e.: if you set min_gap to 3600 seconds (one hour) then the bot will not welcome a player more than once per hour
+        "min_gap": 60
+    },
+    "commands": {
+        "greeting": 20,
+        "distance": 1,
+        "locate": 20,
+        "isp": 20
+    },
+    "commandhelp": {
+        "greeting": "Set server greeting for when you join the server",
+        "distance": "Know approx. distance between you and player",
+        "locate": "Locate a player",
+        "isp": "Know ISP of player."
+    },
+    "commandusage": {
+        "greeting": "^7&prefix^7greeting <text>",
+        "distance": "^7&prefix^7distance <player>",
+        "locate": "^7&prefix^7locate <player>",
+        "isp": "^7&prefix^7isp <player>"
+    },
+    "messages": {
+        // Welcome messages. In those messages you can use the following placeholders:
+        //  &player = player name
+        //  &id = player id
+        //  &lastvisit = last visit time
+        //  &greeting = players greeting
+        //  &group = players group
+        //  &connections = number of times a user has connected
+        //  &country = player's country
+        //  &city = player's city
+        //  &isp = player's ISP
+        //  &cmdusage = general command usage
+
+        // displayed to a user on his first connection
+        "pm_first": "^7Welcome ^2&player^7, this must be your first visit, you are player ^3#&id. Type ^7prefix^7h for help",
+        // displayed to users who have not yet registered
+        "pm_newb": "^7Welcome back ^2&player ^7[^3@&id^7], last visit ^3&lastvisit^7. Type ^3prefix^3register ^7in chat to register. Type ^3prefix^3h ^7for help",
+        "pm_user": "^7Welcome back ^2&player ^7[^3@&id^7], last visit ^3&lastvisit^7, you're in group ^2$group",    // displayed to admins and regs
+        "global_first": "^7Everyone welcome ^2&player^7, player number ^3#&id",     // displayed to everyone when a player joins for the first time
+        "global_user": "^7Everyone welcome back ^2&player^7, player number ^3#&id", // displayed to everyone when a player with less than 15 connections joins
+        "global_greeting": "^2&player^7 joined: &greeting", // displayed if a user has a greeting
+
+        // geowelcome messages
+        "global_user_geo": "^7Everyone welcome back &player^7, from ^3$country",
+        "global_first_geo": "^7Everyone welcome &player^7, from ^3$country",
+
+        // command answers
+        "cmd_err_distance_self": "^7Stoopid",
+        "cmd_err_greeting_bad": "^7Greeting is not formatted properly.\nUsage: $cmdusage",
+        "cmd_err_isp_failed": "^7Could not determine ^1&player^7's ^7ISP",
+        "cmd_err_locate_failed": "^7Could not locate ^1&player",
+        "cmd_err_distance_failed": "^7Could not compute distance with ^1&player",
+        "cmd_greeting_empty": "^7No greeting set",
+        "cmd_greeting_yours": "^7Current Greeting: &greeting",
+        "cmd_greeting_changed": "^7Greeting changed to: &greeting",
+        "cmd_greeting_cleared": "^7Greeting Cleared",
+        "cmd_locate": "^7&player ^3is connected from ^7&city ^3(^7$country^3)",
+        "cmd_distance": "^7&player ^3is ^7$distance ^3km away from you",
+        "cmd_isp": "^2&player ^7is using ^3$isp"
+    }
+}

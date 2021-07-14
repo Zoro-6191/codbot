@@ -1,0 +1,17 @@
+{
+    "settings": 
+    {
+        "max_spamins": 10,  // max_spamins - maximum spam points allowed
+        "mod_level": 20,    // immunity level. Players from that group won't ever get warned for spam
+        "falloff_rate": 6.5     // rate at which spam points decrease with time. (Default 6.5)
+    },
+    "command": {
+        "spamins": 20
+    },
+    "commandhelp": {
+        "spamins": "ngl idk"
+    },
+    "commandusage": {
+        "spamins": "^7&prefix^7spamins"
+    }
+}

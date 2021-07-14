@@ -1,0 +1,32 @@
+{
+    "settings": {
+        // enable/disable parts of plugin, self explanatory.
+        // use true/false without any quotes
+        "enable_firstkill": true,
+        "enable_firsttk": false,
+        "enable_firsths": false // first kill by headshot
+    },
+    "commands": {
+        "firstkill": 60,
+        "firsttk": 60,
+        "firsths": 60
+    },
+    "commandhelp": {
+        "firstkill": "Know the first kill of game",
+        "firsttk": "Know the first teamkill of game",
+        "firsths": "Know the first headshot of game"
+    },
+    "commandusage": {
+        "firstkill": "^7&prefix^7firstkill",
+        "firsttk": "^7&prefix^7firsttk",
+        "firsths": "^7&prefix^7firsths"
+    },
+    "messages": {
+        // Placeholders:
+        // $client = the client who made the kill"
+        // $target = the client who suffered the kill"
+        "global_firstkill": "^2First Kill^3: &killer killed &victim",
+        "global_firsths": "^2First Headshot Kill^3: &killer killed &victim",
+        "global_firsttk": "^1First TeamKill^3: &killer teamkilled &victim"
+    }
+}
