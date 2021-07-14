@@ -95,7 +95,10 @@ async function processChat( line )
 {
     // need to append chat line in case it contains ";"
     if( line.length > 5 )
-    line[4] = line.slice(4).join(';')
+        line[4] = line.slice(4).join(';')
+
+    if( line[4] == "" ) // possible
+        return
 
     const eventhandler = require('./eventhandler')
     // emit event. line[0] could only be either 'say' or 'sayteam' so its safe to do this
