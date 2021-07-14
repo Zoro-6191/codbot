@@ -60,23 +60,12 @@ async function onConnect( guid, slot, ign )
         }
 
     // now fetching info from query
-    // db_id, noc, group_bits, mask_level, greeting, time_add, time_edit from clients table
     // aliascount, penaltiescount, ipaliascount
     // kills, deaths, assists, tk, teamdeaths, suicides, roundsplayed, ratio, skill, winstreak, losestreak, xlrhide from xlr_playerstats
 
 
-    // from clients table
     await db.connection.query(`
-        SELECT kills,
-                deaths,
-                assists,
-                teamkills,
-                teamdeaths,
-                suicides,
-                ratio,
-                skill
-        FROM xlr_playerstats
-        WHERE client_id=${ module.exports.client[toString(slot)].id }`, ( error, result ) => 
+        SELECT * FROM xlr_playerstats WHERE client_id=${ module.exports.client[toString(slot)].id }`, ( error, result ) => 
     {
         if( error )
             console.error( error )  // can't skip this. bot has to shut down.
@@ -85,16 +74,30 @@ async function onConnect( guid, slot, ign )
             Query returned undefined when it should have returned atleast empty set in all possible cases. 
             Bot will Shut Down.`)
         // now result[0] cant be undefined coz event is 'connect' not 'firstconnect'
-        updateClientInfo( slot, "kills", result[0].kills )
-        updateClientInfo( slot, "deaths", result[0].deaths )
-        updateClientInfo( slot, "assists", result[0].assists )
-        updateClientInfo( slot, "tk", result[0].teamkills )
-        updateClientInfo( slot, "teamdeaths", result[0].teamdeaths )
-        updateClientInfo( slot, "suicides", result[0].suicides )
-        updateClientInfo( slot, "ratio", result[0].ratio )
-        updateClientInfo( slot, "skill", result[0].skill )
-
-        console.log( module.exports.client[toString(slot)])
+        if( result[0]!=undefined )  // player registered
+        {
+            updateClientInfo( slot, "registed", true )
+            updateClientInfo( slot, "kills", result[0].kills )
+            updateClientInfo( slot, "deaths", result[0].deaths )
+            updateClientInfo( slot, "assists", result[0].assists )
+            updateClientInfo( slot, "tk", result[0].teamkills )
+            updateClientInfo( slot, "teamdeaths", result[0].teamdeaths )
+            updateClientInfo( slot, "suicides", result[0].suicides )
+            updateClientInfo( slot, "ratio", result[0].ratio )
+            updateClientInfo( slot, "skill", result[0].skill )
+        }
+        else    // player not registered
+        {
+            updateClientInfo( slot, "registed", false )
+            updateClientInfo( slot, "kills", 0 )
+            updateClientInfo( slot, "deaths", 0 )
+            updateClientInfo( slot, "assists", 0 )
+            updateClientInfo( slot, "tk", 0 )
+            updateClientInfo( slot, "teamdeaths", 0 )
+            updateClientInfo( slot, "suicides", 0 )
+            updateClientInfo( slot, "ratio", 1.0 )
+            updateClientInfo( slot, "skill", 1000.0 )
+        }
     })
 }
 
