@@ -31,7 +31,6 @@ Codbot is a bot which works similar to [BigBrotherBot](https://github.com/BigBro
     ```
 - Install and Update all Dependancies:
     ```
-    npm install
     npm update
     ```
 

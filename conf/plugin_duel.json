@@ -1,0 +1,17 @@
+{
+    "commands": {
+        "duel": 20,
+        "duelcancel": 1,
+        "duelreset": 1
+    },   
+    "commandhelp": {
+        "duel": "Duel any player, based on kills",
+        "duelcancel": "",
+        "duelreset": ""
+    },
+    "commandusage": {
+        "duel": "",
+        "duelcancel": "",
+        "duelreset": ""
+    }
+}

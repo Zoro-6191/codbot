@@ -3,13 +3,14 @@
     "codbot": {
         "prefix": "!",
         "prefix_loud": "@",
-        "timezone": "IST"
+        "timezone": "IST",
+        "logcommands": true // print commands initiated by everyone in console
     },
     // database info
     "mysqldb": {
         "host": "localhost",
-        "port": 28960,
-        "user": "root", // avoid root here
+        "port": 3306,   // default: 3306
+        "user": "root", // avoid root whenever possible
         "password": "password",
         "database": "codbot"
     },
@@ -19,6 +20,6 @@
         "port": 28960,
         "rcon_password": "rconpass",
         "public_ip": "snr.vfesports.in",    // domain name works too
-        "logfile": "/root/cod4/mods/pml220/games_mp.log"    // bot cant work without proper logfile specification
+        "logfile": "H:/Games/Call of Duty Modern Warfare/mods/vf_snr_promod-ranked"    // bot cant work without proper logfile specification
     }
 }

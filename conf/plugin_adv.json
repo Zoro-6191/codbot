@@ -1,0 +1,6 @@
+{
+    "settings": {
+        "random": true, // whether adverts will be sent in random sequence
+        "rate": 20  // seconds to send adverts
+    }
+}

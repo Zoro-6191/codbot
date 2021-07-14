@@ -1,7 +1,5 @@
 // this client stores and updates currently playing clients based on their slot
 const db = require('./db')
-const { rcon } = require('./rcon')
-const { player } = require('./eventhandler')
 
 module.exports = 
 {
@@ -14,8 +12,12 @@ async function init()
     client = {} // for simplicity
 
     // get current players and update to client object
-    const onlinePlayers = await rcon.status().onlinePlayers
+    const rcon = require('./rcon')
+    const status = await rcon.rcon.status()
+    const onlinePlayers = await status.onlinePlayers
  
+    // console.log(onlinePlayers)
+
     for( i=0; i < onlinePlayers.length; i++ )
     {
         var s = onlinePlayers[i].num    // we need slot num which is always unordered in 
@@ -28,9 +30,13 @@ async function init()
     }
     this.client = client    // now module.exports.client is an object containing info about our online players
 
+    // player = eventhandler.player
+    const player = require('./eventhandler').player
+    // console.log(eventhandler)
+
     // now we begin with events
-    player.on( 'connect', onConnect( guid, slot, ign ) )
-    player.on( 'disconnect', onDisconnect( guid, slot, ign ) )
+    player.on( 'connect', ( guid, slot, ign ) => onConnect( guid, slot, ign ) )
+    player.on( 'disconnect', ( guid, slot, ign ) => onDisconnect( guid, slot, ign ) )
 }
 
 async function onConnect( guid, slot, ign )
@@ -40,7 +46,8 @@ async function onConnect( guid, slot, ign )
     updateClientInfo( slot, "name", ign )
     updateClientInfo( slot, "guid", guid ) 
 
-    const onlinePlayers = await rcon.status().onlinePlayers
+    const rcon = require('./rcon')
+    const onlinePlayers = await rcon.rcon.status().onlinePlayers
 
     for( i=0; i < status.sv_maxclients; i++ )
         if( onlinePlayers[i].num == slot )

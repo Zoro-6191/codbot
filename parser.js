@@ -1,10 +1,6 @@
 // this file parses each line and makes use outta em
 // events appear to be the best option for independent and togglable plugins
 
-const { player, server } = require('./eventhandler')
-const { client } = require('./client')
-const db = require('./db.js')
-
 module.exports = 
 {
     parseLine
@@ -48,43 +44,31 @@ async function parseLine( line )
         // TO-DO: check correctness of all linesubstr elements
 
         // luckily first word/alphabet is diff in every case, could just do switch
+
+        const eventhandler = require('./eventhandler')
         
         switch( line[0] )
         {
             case 'J':
-                // check if it's player's first connect of session and first time ever joining the server, and emit 2 unrelated events for it
-                if( client[toString(slot)] === undefined )   // if that slot is empty in our client object, it must mean it's the players first connect of session.
-                {
-                    // now to check if it's player's first ever connection to server, must make mysql query checking guid existance
-                    db.connection.query( `SELECT guid FROM clients WHERE guid=${guid}`, ( error, result )=>{
-                        if( error )
-                            return console.error( error )  // can't skip this. bot has to shut down.
-                        if( result === undefined )  // nearly impossible
-                            return console.error(`Unexpected error while emitting Connect event. 
-                            Query returned undefined when it should have returned atleast empty set in all possible cases. 
-                            Bot will Shut Down.`)
-                        else if( result[0] === undefined )  // no match in database
-                            return player.emit( 'firstconnect', guid, slot, line[3] ) // event: firstconnect: guid, slot, ign
-                        else return player.emit( 'connect', guid, slot, line[3] ) // event: connect: guid, slot, ign
-                    } )
-                }
+                // forward to event handler
+                eventhandler.initPlayerConnect( guid, slot, line[3] )
                 return;
-
+4
             case 'Q':
-                // event: disconnect, guid, slot, name
-                player.emit( 'disconnect', guid, slot, line[3] )
+                // forward to event handler
+                eventhandler.initPlayerDisconnect( guid, slot, line[3] )
                 return;
 
             case 'D':
                 // event: damage, guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
                 // TO-DO: emit suicide event
-                player.emit( 'damage', guid, slot, line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
+                eventhandler.player.emit( 'damage', guid, slot, line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
                 return;
             
             case 'K':
                 // event: kill, guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
                 // TO-DO: emit tk event
-                player.emit( 'kill', guid, slot, line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
+                eventhandler.player.emit( 'kill', guid, slot, line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
                 return;
 
             case 'say':
@@ -93,15 +77,15 @@ async function parseLine( line )
                 return;
 
             case 'P_P':
-                player.emit( 'plant', guid, slot, line[3] )
+                eventhandler.player.emit( 'plant', guid, slot, line[3] )
                 return;
 
             case 'P_D':
-                player.emit( 'defuse', guid, slot, line[3] )
+                eventhandler.player.emit( 'defuse', guid, slot, line[3] )
                 return;
 
             case 'Weapon':
-                player.emit( 'weapPick', guid, slot, line[3], line[4] )
+                eventhandler.player.emit( 'weapPick', guid, slot, line[3], line[4] )
                 return;
         }
     }
@@ -113,20 +97,22 @@ async function processChat( line )
     if( line.length > 5 )
     line[4] = line.slice(4).join(';')
 
+    const eventhandler = require('./eventhandler')
     // emit event. line[0] could only be either 'say' or 'sayteam' so its safe to do this
-    player.emit( line[0], line[1], line[2], line[3], line[4] )
+    eventhandler.player.emit( line[0], line[1], line[2], line[3], line[4] )
 
     // and an event which includes both say and sayteam for shit like commands
-    player.emit( 'say/sayteam', line[1], line[2], line[3], line[4] )
+    eventhandler.player.emit( 'say/sayteam', line[1], line[2], line[3], line[4] )
 }
 
 async function processServerLines(line)
 {
+    const eventhandler = require('./eventhandler')
     if(line.startsWith('InitGame'))
     {
-        server.emit( 'roundstart' )
-        server.emit( 'initgame', line )
+        eventhandler.server.emit( 'roundstart' )
+        eventhandler.server.emit( 'initgame', line )
     }
     else if( line.startsWith('ExitLevel') )
-        server.emit( 'endmap' )
+        eventhandler.server.emit( 'endmap' )
 }

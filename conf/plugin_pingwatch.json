@@ -1,0 +1,16 @@
+{
+    "settings": {
+        "interval": 10, // seconds in which the plugin which check players for high pings
+        "max_ping": 600,    // the maximum tolerated ping value in ms
+        "max_ping_duration": 50 // in second. For how long should a player have a too high ping for action to be taken
+    },
+    "commands": {
+        "ci": 20
+    },
+    "commandhelp": {
+        "ci": "Kick a CI Player"
+    },
+    "commandusage": {
+        "ci": "^7&prefix^7ci <player>"
+    }
+}

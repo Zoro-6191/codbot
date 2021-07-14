@@ -1,13 +1,14 @@
 // this file takes care of mysql database and its connectivity to rest of the project
+// TO-DO: check database integrity
 const mysql = require('mysql')
-const conf = require('./conf')
+const eventhandler = require('./eventhandler')
 
 module.exports = 
 {
-	init: function()
+	initMySQLdb: function()
     {
-		mysqldb = conf.mainconfig.mysqldb
-		console.log(mysqldb)
+		const mainconfig = require('./conf').mainconfig
+		mysqldb = mainconfig.mysqldb
 		this.connection = mysql.createConnection(
 		{
 			host: mysqldb.host,
@@ -16,8 +17,9 @@ module.exports =
 			password: mysqldb.password,
 			database: mysqldb.database
 		});
-		console.log(`Connected to MySQL Database`)
 		this.keepAlive();
+		// console.log(`Initialized: MySQL Database`)
+		console.log(eventhandler)
 	},
 	keepAlive: async function()
     {

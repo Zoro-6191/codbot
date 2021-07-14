@@ -1,12 +1,13 @@
 // ==== GROUPS: ============
-// 0 - Guest
-// 1 - User
-// 2 - Regular
-// 20 - Moderator
-// 40 - Admin
-// 60 - Fulladmin
-// 80 - Senioradmin
-// 100 - Superadmin
+// <admin level> - <group name> (groupbits)     // you won't need to know groupbits in most scenarios
+// 0 - Guest (0)
+// 1 - User (1)
+// 2 - Regular (2)
+// 20 - Moderator (8)
+// 40 - Admin (16)
+// 60 - Fulladmin (32)
+// 80 - Senioradmin (64)
+// 100 - Superadmin (128)
 // ===================
 
 {
@@ -237,15 +238,15 @@
         "cmd_err_kick_self": "^7Can't kick yourself",
         "cmd_err_kick_denied": "Can't kick ^1&player",
         "cmd_err_temp_ban_denied": "^7Can't temp ban ^1&player",
-        "cmd_err_warn_too_fast": "^7Only one warning per %(num_second)s seconds can be issued",
+        "cmd_err_warn_too_fast": "^7Only one warning per &warnsecs seconds can be issued",
         "cmd_err_warn_self": "^7Can't warn yourself",
-        "cmd_baninfo": "^7&player ^7has &numbans active ban(s)",
-        "cmd_baninfo_no_bans": "^7&player ^7has no active bans",
-        "cmd_group_unknown": "^7Group %(group_name)s does not exist",
-        "cmd_group_beyond_reach": "^7Group %(group_name)s is beyond your reach",
+        "cmd_baninfo": "^2&player ^7has &numbans active ban(s)",
+        "cmd_baninfo_no_bans": "^2&player ^7has no active bans",
+        "cmd_group_unknown": "^7Group &groupname does not exist",
+        "cmd_group_beyond_reach": "^7Group &groupname is beyond your reach",
         "cmd_cleared_warnings": "%(admin)s^7 has cleared %(player)s^7 of all tk-points and warnings",
         "cmd_cleared_warnings_for_all": "%(admin)s^7 has cleared everyone's tk-points and warnings",
-        "cmd_help_available": "^7Available commands: %s",
+        "cmd_help_available": "^7Available commands: &cmds",
         "cmd_groups_in": "^7&player^7 is in groups &groups",
         "cmd_say": "^7&player^7: &text",
         "cmd_player_id": "^2&player ^7[^3&id^7]",
@@ -259,8 +260,8 @@
         "regme_confirmation": "^7Thanks for your registration. You are now in group ^7&groupname",
         "regme_annouce": "^3&player ^7put in group ^2&groupname",
         "groups_added": "^1&player ^7added to group ^2&groupname",
-        "groups_put": "^7&name ^7put in group &groupname",
-        "groups_none": "^7&name ^7is not in any groups",
+        "groups_put": "^7&player ^7put in group &groupname",
+        "groups_none": "^7&player ^7is not in any groups",
         "help_command": "^2%s%s ^7%s",
         "regme_regged": "^7You are now in group ^2&groupname",
         "help_none": "^7No Commands available for you",
@@ -335,15 +336,15 @@
         "forum": "^3Visit our Server forums at www.test.com",
         "stack": "^7No clan stacking, members must split evenly between the teams, go spectator and wait if you have to",
 
-        "rule1": "^3Rule #1: No racism of any kind",
-        "rule2": "^3Rule #2: No clan stacking, members must split evenly between the teams",
-        "rule3": "^3Rule #3: No arguing with admins (listen and learn or leave)",
-        "rule4": "^3Rule #4: No abusive language or behavior towards admins or other players",
-        "rule5": "^3Rule #5: No offensive or potentially offensive names, annoying names, or in-game (double caret (^)) color in names",
-        "rule6": "^3Rule #6: No recruiting for your clan, your server, or anything else",
-        "rule7": "^3Rule #7: No advertising or spamming of websites or servers",
-        "rule8": "^3Rule #8: No profanity or offensive language (in any language)",
-        "rule9": "^3Rule #9: Do ^1NOT ^3fire at teammates or within 10 seconds of spawning",
+        "rule1": "^3Rule #1: ^7No racism of any kind",
+        "rule2": "^3Rule #2: ^7No clan stacking, members must split evenly between the teams",
+        "rule3": "^3Rule #3: ^7No arguing with admins (listen and learn or leave)",
+        "rule4": "^3Rule #4: ^7No abusive language or behavior towards admins or other players",
+        "rule5": "^3Rule #5: ^7No offensive or potentially offensive names, annoying names, or in-game (double caret (^)) color in names",
+        "rule6": "^3Rule #6: ^7No recruiting for your clan, your server, or anything else",
+        "rule7": "^3Rule #7: ^7No advertising or spamming of websites or servers",
+        "rule8": "^3Rule #8: ^7No profanity or offensive language (in any language)",
+        "rule9": "^3Rule #9: ^7Do NOT fire at teammates or within 10 seconds of spawning",
         "rule10": "^3Rule #10: Offense players must play for the objective and support their team"
     }
 }
