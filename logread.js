@@ -2,6 +2,7 @@
 const fs = require('fs')
 const { Tail } = require('tail')
 const { exit } = require('process')
+const ErrorHandler = require('./errorhandler')
 
 module.exports = 
 {
@@ -17,10 +18,7 @@ async function initLogRead()
 
     // check if mentioned logfile exists
     if (!fs.existsSync(logpath)) 
-    {
-        console.error( `\nERROR: Logfile doesn't exist: ${logpath}\nBot will shut down.` )
-        return exit(1)
-    }
+        ErrorHandler.fatal(`Logfile doesn't exist: ${logpath}`)
 
     // check if mentioned logfile has proper extension
     const ext = extname(logpath)

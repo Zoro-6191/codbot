@@ -1,5 +1,6 @@
 // this client stores and updates currently playing clients based on their slot
 const db = require('./db')
+const ErrorHandler = require('./errorhandler')
 
 module.exports = 
 {
@@ -14,9 +15,13 @@ async function init()
     // get current players and update to client object
     const { rcon } = require('./rcon')
     const status = await rcon.rconStatus()
+
+    // if server offline, for now just crash
+    if( !(await status.online) )
+        return ErrorHandler.fatal(`COD4 Server not online`)
+    else rcon.say(`^1[^3CODBOT^1] ^2Started.\n^7Made by ^2Zoro`)
+
     const onlinePlayers = await status.onlinePlayers
- 
-    // console.log(onlinePlayers)
 
     for( i=0; i < onlinePlayers.length; i++ )
     {
@@ -110,7 +115,7 @@ async function updateClientInfo( slot, str, value )
         module.exports.client[toString(slot)] = {}
 
     if( slot == undefined || str == undefined || value == undefined )
-        return console.error(`Error in updateClientInfo(): one of the args was undefined.\nSLOT: ${slot}\nProperty: ${str}\nValue: ${value}`)
+        return ErrorHandler.minor(`Error in updateClientInfo(): one of the args was undefined.\nSLOT: ${slot}\nProperty: ${str}\nValue: ${value}`)
 
     module.exports.client[toString(slot)][str] = value
 }

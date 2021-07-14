@@ -85,7 +85,7 @@ async function parseLine( line )
                 return;
 
             case 'Weapon':
-                eventhandler.player.emit( 'weapPick', guid, slot, line[3], line[4] )
+                eventhandler.player.emit( 'weaponpick', guid, slot, line[3], line[4] )
                 return;
         }
     }

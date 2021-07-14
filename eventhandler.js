@@ -1,4 +1,5 @@
 // this file manages all the events and provides accessibility to plugins
+const ErrorHandler = require('./errorhandler')
 var player, server, bot // for local use
 
 module.exports = 
@@ -43,20 +44,13 @@ async function initPlayerConnect( guid, slot, ign )
         db.connection.query( `SELECT * FROM clients WHERE guid=${guid}`, ( error, result )=>
         {
             const { updateClientInfo } = require('./client')
-            if( error )
-                return console.error( error )  // can't skip this. bot has to shut down.
-            if( result === undefined )  // nearly impossible
-                return console.error(`Unexpected error while emitting Connect event. 
-                Query returned undefined when it should have returned atleast empty set in all possible cases. 
-                Bot will Shut Down.`)
+            if( error || result === undefined )
+                return ErrorHandler.fatal( error? error : `Query returned undefined when it should have returned atleast empty set` )  // can't skip this. bot has to shut down.
+
             else if( result[0] === undefined )  // no match in database
             {
-                // here we do pre emission shit like creating basic database entries
-                // then updating all info to main client object
-                // then emitting 'firstconnect'
+                // here we do pre emission shit like creating basic database entries and updating all info to main client object
 
-                console.log(`While first connect: ${result}`)
-                
                 player.emit( 'firstconnect', guid, slot, ign ) // event: firstconnect: guid, slot, ign
             }
             else    // match in db, entry exists
@@ -90,8 +84,7 @@ async function initPlayerDisconnect( guid, slot, ign )
     // time format in b3 is in 10 digits, which can only be UTC in seconds.
     rightnow = Math.floor(Date.now()/1000)
 
-     // db.connection.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ console.error( `Error while writing info about client to Database in Disconnect Event:
-                // ${err}` ) })
+    db.connection.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
     
     client[toString(slot)] = undefined  // should be enough
 
