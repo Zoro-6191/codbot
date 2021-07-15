@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS `aliases` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `num_used` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `alias` VARCHAR(32) NOT NULL DEFAULT '',
+  `client_id` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `time_add` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `time_edit` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  UNIQUE KEY `alias` (`alias`,`client_id`),
+  KEY `client_id` (`client_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

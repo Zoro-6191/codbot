@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS `ipaliases` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `num_used` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `ip` VARCHAR(16) NOT NULL,
+  `client_id` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `time_add` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `time_edit` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  UNIQUE KEY `ipalias` (`ip`,`client_id`),
+  KEY `client_id` (`client_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

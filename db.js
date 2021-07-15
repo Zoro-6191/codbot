@@ -1,9 +1,18 @@
 // this file takes care of mysql database and its connectivity to rest of the project
 // TO-DO: check database integrity
+const fs = require('fs')
 const mysql = require('mysql')
 const { exit } = require('process')
 const ErrorHandler = require('./errorhandler')
-const { bot } = require('./eventhandler')
+
+var requiredTables = [ 'aliases', 'clients', , 'ctime', 'callvote',
+						// 'current_clients', 'current_svars', 	// TO-DO: later
+						'groups', 'ipaliases', 
+						'penalties', 'xlr_actionstats', 'xlr_bodyparts',
+						'xlr_history_monthly', 'xlr_history_weekly', 'xlr_mapstats',
+						'xlr_opponents', 'xlr_playeractions', 'xlr_playerbody',
+						'xlr_playermaps', 'xlr_playerstats', 'xlr_weaponstats', 
+						'xlr_weaponusage' ]	
 
 module.exports = 
 {
@@ -38,7 +47,7 @@ module.exports =
 
 		// now to check if host/user/pass are correct and database exists and we have access to it:
 		// this.connection.query(`SELECT *  FROM information_schema WHERE TABLE_NAME = "my_table"`)
-		await this.connection.query(`SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${mysqldb.database}'`, ( err, result )=>
+		await this.pool.query(`SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${mysqldb.database}'`, ( err, result )=>
 		{
 			if( err != undefined && err.code == 'ECONNREFUSED' )
 				ErrorHandler.fatal( `MySQL Server refused connection.\nThis means either the MySQL server is down or has blocked this IP Address.` )
@@ -65,19 +74,22 @@ module.exports =
 							if( err || result == undefined)
 								ErrorHandler.fatal(`Error while creating database\n${err?err:'Query returned empty object'}`)
 							
-							console.log(`Successful`);
+							console.log(`Successful`)
 							// TO-DO: maybe setup basic tables here n now
 							// aliases, clients, current_clients, current_svars, groups, ipaliases, penalties, xlr?
+							DBExistsGoAhead()
 						})
 					}
 					else { ErrorHandler.minor(`Can't continue without a database. Quitting...`);exit(1); }
+
+					// for now.
 					bot.emit('database_ready')
 				})
 			}
 			
-			if( result != undefined && result[0] != undefined )	// table already exists		// [ RowDataPacket { SCHEMA_NAME: 'codbot' } ]
+			if( result != undefined && result[0] != undefined )	// database already exists		// [ RowDataPacket { SCHEMA_NAME: 'codbot' } ]
 			{
-				bot.emit('database_ready')
+				DBExistsGoAhead()
 			}
 		})
 	},
@@ -96,14 +108,71 @@ function checkConfigEntries( mysqldb )
 	// host can be pretty much anything
 	// but can't contain spaces
 
-	Object.keys(mysqldb).forEach( item => 
+	Object.keys(mysqldb).forEach( property => 
 	{
-		// trim() = remove white spaces
-		if( item != "port" )
-			mysqldb[item].trim()
+		if( property != "port" )
+		{
+			mysqldb[property] = mysqldb[property].trim()	// remove extra white spaces from line start and end
 
-		// for idiots
-		if( item != "port" && mysqldb[item].split(' ').length > 1 )
-			ErrorHandler.fatal(`Invalid Entry in JSON\nFile: /conf/codbot.json\nIn property "${item}" of mysqldb\nSpaces are not allowed: "${mysqldb[item]}"`)
+			// for idiots
+			if( mysqldb[property].split(' ').length > 1 )
+				ErrorHandler.fatal(`Invalid Entry in JSON\nFile: /conf/codbot.json\nIn property "${property}" of mysqldb\nSpaces are not allowed: "${mysqldb[property]}"`)
+		}
 	});
+}
+
+function DBExistsGoAhead()
+{
+	const { bot, player } = require('./eventhandler')
+
+	var currentTables = []
+	var missingTables = []
+
+	// now to check what tables exists and what not
+	module.exports.connection.query( `SHOW TABLES;`, (err, result)=> {
+		if( err )
+			console.error(err)
+		else if( result.length == 0 )
+			console.log(`No tables exist\nCreating`)
+		else for( i=0; i< result.length; i++ )
+			currentTables[i] = result[i].Tables_in_codbot
+
+		if( currentTables.length > 0 )
+		{
+			console.log(`Current Tables:`)
+			console.log(currentTables)
+		}
+ 
+		// check for missing tables
+
+		// looping through arrays is not really required
+		// could only use 'CREATE TABLE IF NOT EXISTS'
+		// but then we won't really know which table was missing
+		// and which ones we needed to insert
+		// all of this is done considering b3 database can be used with codbot
+
+		for( i=0 ; i < requiredTables.length ; i++ )
+			if(!currentTables.includes(requiredTables[i])) 
+				missingTables.push(requiredTables[i]);
+
+		if( missingTables.length > 0 )
+		{
+			console.log(`Missing Tables:`)
+			console.log(missingTables)
+
+			// now to take table schema from template and query it
+			// we doing it one by one to avoid exceptions as much as possible
+
+			for( i=0; i < missingTables.length; i++ )
+			{
+				var template = fs.readdirSync(`./sql/templates/${missingTables[i]}`)
+
+				console.log(template)
+			}
+		}
+
+		// now we read from sql templates in /sql
+
+		bot.emit('database_ready')
+	} )
 }

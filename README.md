@@ -35,7 +35,7 @@ Codbot is a bot which works similar to [BigBrotherBot](https://github.com/BigBro
     ```
 
 # Configure
-- Navigate to _conf_ folder. Every file with extension `.ini` is configurable, and is pretty explainatory.
+- Navigate to _conf_ folder. Every file with extension `.json` is configurable, and is pretty explainatory.
 
 # Run
 - Navigate to repository path, and type this in console:
