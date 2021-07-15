@@ -47,11 +47,11 @@
     {
         "guest_cmds": 
         {
-            "cookie": "tell <ARG:FIND_PLAYER:PID> ^1<PLAYER:NAME> ^7 gave you a ^2COOKIE^7",
+            "cookie": "tell <ARG:FIND_PLAYER:PID> ^1<PLAYER:NAME> ^7 gave you a ^2COOKIE^7"
         },
         "user_cmds":
         {
-            "ns": "tell <LAST_KILLER:PID> nice shot!",
+            "ns": "tell <LAST_KILLER:PID> nice shot!"
         },
         "regular_cmds":
         {
@@ -59,11 +59,11 @@
         },
         "mod_cmds":
         {
-            "sry": "tell <LAST_VICTIM:PID> sorry m8 :|",
+            "sry": "tell <LAST_VICTIM:PID> sorry m8 :|"
         },
         "admin_cmds":
         {
-            "owned": "say ^2<PLAYER:EXACTNAME> ^0OWNED ^1<LAST_VICTIM:PID>",
+            "owned": "say ^2<PLAYER:EXACTNAME> ^0OWNED ^1<LAST_VICTIM:PID>"
         },
         "fulladmin_cmds":
         {

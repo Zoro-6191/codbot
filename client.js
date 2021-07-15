@@ -13,8 +13,8 @@ async function init()
     client = {} // for simplicity
 
     // get current players and update to client object
-    const { rcon } = require('./rcon')
-    const status = await rcon.rconStatus()
+    const { rcontool } = require('./rcon')
+    const status = await rcontool.rconStatus()
 
     // if server offline, for now just crash
     if( !(await status.online) )
@@ -51,8 +51,8 @@ async function onConnect( guid, slot, ign )
     updateClientInfo( slot, "name", ign )
     updateClientInfo( slot, "guid", guid ) 
 
-    const { rcon } = require('./rcon')
-    const status = await rcon.rconStatus()
+    const { rcontool } = require('./rcon')
+    const status = await rcontool.rconStatus()
     const onlinePlayers = await status.onlinePlayers
 
     for( i=0; i < onlinePlayers.length; i++ )

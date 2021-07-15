@@ -1,33 +1,20 @@
 // this file manages all the events and provides accessibility to plugins
 const ErrorHandler = require('./errorhandler')
-var player, server, bot // for local use
 
 module.exports = 
 {
     initEventHandler,
     initPlayerConnect,
-    initPlayerDisconnect,
-    player,
-    server,
-    bot
+    initPlayerDisconnect
 }
 
 function initEventHandler()
 {
     const events = require('events')
 
-    var player1 = new events.EventEmitter()
-    var server1 = new events.EventEmitter()
-    var bot1 = new events.EventEmitter()
-
-    module.exports.player = player1
-    module.exports.server = server1
-    module.exports.bot = bot1
-
-    // for local use
-    player = player1
-    server = server1
-    bot = bot1
+    module.exports.player = new events.EventEmitter()
+    module.exports.server = new events.EventEmitter()
+    module.exports.bot = new events.EventEmitter()
 
     console.log("Initialized: Event Handler")
 }
@@ -36,6 +23,7 @@ async function initPlayerConnect( guid, slot, ign )
 {
     const db = require('./db')
     const { client } = require('./client')
+    player = module.exports.player
 
     // check if it's player's first connect of session and first time ever joining the server, and emit 2 unrelated events for it
     if( client[toString(slot)] === undefined )   // if that slot is empty in our client object, it must mean it's the players first connect of session.
@@ -77,6 +65,7 @@ async function initPlayerDisconnect( guid, slot, ign )
 {
     const db = require('./db')
     const { client } = require('./client')
+    player = module.exports.player
     // here we firstly change time_edit in clients table 
     // then remove disconnected player from global client object
     // then emitting 'disconnect'

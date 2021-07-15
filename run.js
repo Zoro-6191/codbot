@@ -20,10 +20,13 @@ const client = require('./client.js')
 
 eventhandler.initEventHandler()
 config.initConf()   // read all configurations
-rcon.initRcon()    // create UDP socket for rcon
-db.initMySQLdb()   // connect to mysql database
-client.init()
-logread.initLogRead()  // begin reading logfile
+db.initMySQLdb()  
+
+eventhandler.bot.once( 'database_ready', ()=> {
+    rcon.initRcon()    // create UDP socket for rcon
+    client.init()   // global client object
+    logread.initLogRead()  // begin reading logfile
+})
 
 // console.log( eventhandler )
 

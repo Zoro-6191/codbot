@@ -19,7 +19,7 @@
     {
         "host": "localhost",
         "port": 3306,   // default: 3306
-        "user": "root", // avoid root whenever possible
+        "user": "codbot", // avoid root whenever possible
         "password": "password",
         "database": "codbot"
     },
