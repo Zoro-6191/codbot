@@ -1,11 +1,12 @@
 // this file takes care of mysql database and its connectivity to rest of the project
 // TO-DO: check database integrity
+const { table } = require('console')
 const fs = require('fs')
 const mysql = require('mysql')
 const { exit } = require('process')
 const ErrorHandler = require('./errorhandler')
 
-var requiredTables = [ 'aliases', 'clients', , 'ctime', 'callvote',
+var requiredTables = [ 'aliases', 'clients', 'ctime', 'callvote',
 						// 'current_clients', 'current_svars', 	// TO-DO: later
 						'groups', 'ipaliases', 
 						'penalties', 'xlr_actionstats', 'xlr_bodyparts',
@@ -47,7 +48,7 @@ module.exports =
 
 		// now to check if host/user/pass are correct and database exists and we have access to it:
 		// this.connection.query(`SELECT *  FROM information_schema WHERE TABLE_NAME = "my_table"`)
-		await this.pool.query(`SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${mysqldb.database}'`, ( err, result )=>
+		await this.connection.query(`SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${mysqldb.database}'`, ( err, result )=>
 		{
 			if( err != undefined && err.code == 'ECONNREFUSED' )
 				ErrorHandler.fatal( `MySQL Server refused connection.\nThis means either the MySQL server is down or has blocked this IP Address.` )
@@ -75,6 +76,17 @@ module.exports =
 								ErrorHandler.fatal(`Error while creating database\n${err?err:'Query returned empty object'}`)
 							
 							console.log(`Successful`)
+
+							// re-establish connection
+							this.connection = mysql.createConnection(
+								{
+									host: mysqldb.host,
+									port: mysqldb.port,
+									user: mysqldb.user,
+									password: mysqldb.password,
+									database: mysqldb.database
+								});
+							
 							// TO-DO: maybe setup basic tables here n now
 							// aliases, clients, current_clients, current_svars, groups, ipaliases, penalties, xlr?
 							DBExistsGoAhead()
@@ -131,7 +143,7 @@ function DBExistsGoAhead()
 	// now to check what tables exists and what not
 	module.exports.connection.query( `SHOW TABLES;`, (err, result)=> {
 		if( err )
-			console.error(err)
+			ErrorHandler.fatal(err)
 		else if( result.length == 0 )
 			console.log(`No tables exist\nCreating`)
 		else for( i=0; i< result.length; i++ )
@@ -156,23 +168,53 @@ function DBExistsGoAhead()
 				missingTables.push(requiredTables[i]);
 
 		if( missingTables.length > 0 )
-		{
-			console.log(`Missing Tables:`)
-			console.log(missingTables)
-
-			// now to take table schema from template and query it
-			// we doing it one by one to avoid exceptions as much as possible
-
-			for( i=0; i < missingTables.length; i++ )
-			{
-				var template = fs.readdirSync(`./sql/templates/${missingTables[i]}`)
-
-				console.log(template)
-			}
-		}
-
-		// now we read from sql templates in /sql
+			CreateMissingTables( missingTables )
 
 		bot.emit('database_ready')
 	} )
+}
+
+function CreateMissingTables( missingTables )
+{
+	console.log(`Missing Tables:`)
+	console.log(missingTables)
+
+	// now to take table schema from template and query it
+	// we doing it one by one to avoid exceptions as much as possible
+
+	for( var i=0; i < missingTables.length; i++ )
+	{
+		const table = missingTables[i]
+		var template = fs.readFileSync(`./sql/templates/${table}.sql`,'utf-8')
+
+		module.exports.connection.query( template, (err, result)=>{
+			if(err)
+				ErrorHandler.fatal(err)
+			else console.log(`Created Table: "${table}"`);
+
+			if( table == 'groups')
+				initGroupTable()
+		} )
+	}
+}
+
+function initGroupTable()
+{
+	var rl = require('readline').createInterface( {input: fs.createReadStream('./sql/templates/defaultgroups.sql'), output: process.stdout, terminal: false } );
+	rl.on( 'line', (line)=>{
+
+		module.exports.connection.query( line, (err,result)=>{
+			if(err)
+				ErrorHandler.fatal(err)
+		})
+	})
+	rl.on( 'close', ()=> console.log(`Initiated Default Groups:
+	100 - Super Admin
+	80 - Senior Admin
+	60 - Full Admin
+	40 - Admin
+	20 - Moderator
+	2 - Regular
+	1 - User
+	0 - Guest`))
 }
