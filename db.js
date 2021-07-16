@@ -135,7 +135,7 @@ function checkConfigEntries( mysqldb )
 
 function DBExistsGoAhead()
 {
-	const { bot, player } = require('./eventhandler')
+	const { bot } = require('./eventhandler')
 
 	var currentTables = []
 	var missingTables = []

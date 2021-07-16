@@ -18,9 +18,9 @@ const client = require('./client.js')
 // =================================================
 // console.log( Math.floor(Date.now()/1000) )
 
-eventhandler.initEventHandler()
+eventhandler.initEventHandler() // juice
 config.initConf()   // read all configurations
-db.initMySQLdb()  
+db.initMySQLdb()  // can take seconds depending upon ping and if it's initial setup
 
 eventhandler.bot.once( 'database_ready', ()=> {
     rcon.initRcon()    // create UDP socket for rcon
