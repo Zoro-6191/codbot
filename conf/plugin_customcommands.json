@@ -43,6 +43,9 @@
 //
 
 {
+    "name": "Custom Commands Plugin",
+    "desc": "Manages all sorts of custom commands",
+    
     "cmds": 
     {
         "guest_cmds": 

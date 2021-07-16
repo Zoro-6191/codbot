@@ -10,6 +10,9 @@
 // 100 - Superadmin (128)
 // ===================
 {
+    "name": "Geolocation Plugin",
+    "desc": "Responsible for player location related stuff and welcoming them",
+    
     "settings": {
         // Choose which message will be sent on player connection.
         // pm_ messages are sent privately while global_ are public.

@@ -11,7 +11,11 @@
 // ===================
 
 {
-    "settings": {
+    "name": "Admin Plugin",
+    "desc": "Manages basic functioning of the bot",
+    
+    "settings": 
+    {
         "noreason_level": 100, // admin from this level are not required to specify a reason when giving penalties to players
         "long_tempban_level": 100,  // admin level required to be able to issue bans longer than long_tempban_max_duration
         "long_tempban_max_duration": "3h", // maximum ban duration that can be inflicted by admin of level below long_tempban_level
@@ -32,7 +36,9 @@
             "warn_command_abusers": false   // warn players who try invalid/no permission commands
         }
     },
-    "commands": {
+
+    "commands": 
+    {
         // level required for command usage:
         "putgroup": 100,
         "ungroup": 100,
@@ -171,7 +177,9 @@
         "warns": "Get player's warn count",
         "warntest": "Test to see if you can warn a player"
     },
-    "commandusage": {
+    // each command usage
+    "commandusage": 
+    {
         "admins": "^7&prefix^7admins",
         "admintest": "^7&prefix^7admintest ^7<player/@id>",
         "aliases": "^7&prefix^7aa <player/@id>",
@@ -224,7 +232,8 @@
         "warns": "^7&prefix^7warns <player/@id>",
         "warntest": "^7&prefix^7warntest <player/@id>"
     },
-    "messages": {
+    "messages": 
+    {
         "cmd_err_unknown_cmd": "^7Unrecognized command ^1&cmd",
         "cmd_err_invalidparams": "^7Invalid parameters",
         "cmd_err_noaccess": "^7You need to be in group ^1&groupname ^7to use ^3&prefix^3&cmd",
@@ -279,12 +288,14 @@
         "reason_too_many_warnings": "^7too many warnings: &reason",
         "warning_autokick_alert": "^1ALERT^7: &name^7 auto-kick from warnings if not cleared [^3&warnings^7] &reason"
     },
+
     // Define here shortcuts for warning reasons. Those shortcuts can be used with the !kick, !tempban, !ban, and !permban commands.
     // The format of warning reasons can be of the form "<duration>, <message>". The duration defines how long such a warning will
     // last before expiring. The message is what will be sent to the player.
     // NOTE : in the message, you can make reference to an existing spammage shortcut by using the form '/spam#<spammage keyword>'
     // NOTE2 : you can define warning shortcuts aliases if you don't use duration and the message is of the form '/<warn shortcut>'
-    "reasons": {
+    "reasons": 
+    {
         "generic": "1h, ^7",
         "default": "1h, ^7behave yourself",
 
@@ -329,9 +340,11 @@
         "spectator": "5m, ^7spectator too long on full server",
         "spam": "1h, ^7do not spam, shut-up."
     },
+
     // You can define shortcuts to messages that can be used with the !spam command. Note if the message shortcut is of 
     // the form 'rule#' where # is a number between 1 and 20, they will be used for the !rules command.	
-    "spamages": {
+    "spamages": 
+    {
         "join": "^3Join our Server by signing up on the forums at www.test.com",
         "forum": "^3Visit our Server forums at www.test.com",
         "stack": "^7No clan stacking, members must split evenly between the teams, go spectator and wait if you have to",

@@ -10,6 +10,9 @@
 // 100 - Superadmin (128)
 // ===================
 {
+    "name": "AFK Plugin",
+    "desc": "Takes care of AFK Players",
+    
     "settings":
     {
         // How does the plugin detect AFK?
@@ -65,6 +68,6 @@
         "are_you_afk": "Are you AFK?",
 
         // kick_reason: message to display to explain the kick
-        "kick_reason": "AFK for too long",
+        "kick_reason": "AFK for too long"
     }
 }

@@ -1,0 +1,86 @@
+{
+    "name": "XLR Stats Plugin",
+    "desc": "Manages player, weapon and map stats",
+    
+    "settings": 
+    {
+        "minlevel": 0,
+        "suicide_penalty_percent": 0.05,
+        "tk_penalty_percent": 0.1,
+
+        // provisional ranking means that the first Kswitch_confrontations are used only to determine the new players base skill
+        // the opponents skill will not be changed during this period
+        // when minlevel = 0 this is highly recommended!
+        "provisional_ranking": true,
+
+        // automatically purge players from xlrstats after a year of inactivity? (cannot be undone!)
+        "auto_purge": false,
+
+        // exclude_bots: do not count kills and damages to and from bots - allowed value: yes or no
+        "exclude_bots": true
+
+        // *** assist bonus settings ***
+        // Call of Duty passes damage amount info to the logs. Therefore we can award assists based on damage.
+        // So in the CoD series we award an assist if the amount of damage is 50 points or more and they must occur
+        // within 10 seconds before the victim dies. In other games we shorten the timespan because we don't have
+        // the amount of damage available, we have to award all assists, even the very tiny ones. The shorter time
+        // compensates for that.
+        //
+        // seconds the assist must have taken place before the victim dies ( Call of Duty )
+        // "damage_assist_release": 10
+    },
+
+    "commands":
+    {
+        "xlrstats": 0,
+        "xlrtopstats": 2,
+        "xlrhide": 60
+    },
+    "commandalias":
+    {
+        "xlrstats": "xlr"
+    },
+    "commandhelp":
+    {
+        "xlrstats": "Get your/other player's XLR Stats",
+        "xlrtopstats": "Get top XLR Stats of the server",
+        "xlrhide": "Hide your/other player's xlrstats"
+    },
+    "commandusage":
+    {
+        "xlrstats": "^7%prefix%^7xlrstats <player/@id>",
+        "xlrtopstats": "^7%prefix%^7xlrtopstats",
+        "xlrhide": "^7%prefix%^7xlrhide <player/@id>"
+    },
+
+    "messages":
+    {
+        // cmd_xlrstats: Configure the message when someone use !xlrstats
+        // Available placeholders:
+        //                       %name%       - player name
+        //                       %kills%      - player kills
+        //                       %deaths%     - player deaths
+        //                       %teamkills%  - teamkills made by the player
+        //                       %ratio%      - kill/death ratio
+        //                       %skill%      - player skill
+        "cmd_xlrstats": "^3XLR Stats: ^7%name% ^7: K ^2%kills% ^7D ^3%deaths% ^7TK ^1%tk% ^7Ratio ^5%ratio% ^7Skill ^3%skill%",
+        "cmd_xlrtopstats": "^3# $number: ^7%name% ^7: Skill ^3%skill% ^7Ratio ^5%ratio% ^7Kills: ^2%kills%"
+    },
+
+    // This section contains the configuration for weapons multipliers.
+    // Insert your weapon multipliers here, as they appear in the game log.
+    // See example below
+    "weapons":
+    {
+        "example_mp": 1.0,
+        "example2_mp": 1.5
+    },
+
+    "replacements":
+    {
+        // Collecting MOD_*** instead of weapons.
+        // Good if you want to have bashes/melees collected instead of the weapon used to bash/melee the victim with
+        "MOD_MELEE": "mod_melee",
+        "MOD_FALLING": "mod_falling"
+    }
+}

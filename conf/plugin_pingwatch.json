@@ -1,4 +1,7 @@
 {
+    "name": "Pingwatch Plugin",
+    "desc": "Watches over player pings",
+    
     "settings": 
     {
         "interval": 10, // seconds in which the plugin which check players for high pings

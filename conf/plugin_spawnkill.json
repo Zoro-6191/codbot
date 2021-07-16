@@ -11,6 +11,9 @@
 // ===================
 
 {
+    "name": "Spawnkill plugin",
+    "desc": "Used to prevent spawnkillings",
+    
     "hit": {
         // maxlevel and above will be discarded by the plugin
         "maxlevel": 40,

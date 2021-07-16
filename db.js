@@ -149,12 +149,6 @@ function DBExistsGoAhead()
 		else for( i=0; i< result.length; i++ )
 			currentTables[i] = result[i].Tables_in_codbot
 
-		if( currentTables.length > 0 )
-		{
-			console.log(`Current Tables:`)
-			console.log(currentTables)
-		}
- 
 		// check for missing tables
 
 		// looping through arrays is not really required
@@ -168,7 +162,14 @@ function DBExistsGoAhead()
 				missingTables.push(requiredTables[i]);
 
 		if( missingTables.length > 0 )
+		{
+			if( currentTables.length > 0 )	// atleast 1 table exists
+			{
+				console.log(`Current Tables:`)
+				console.log(currentTables)
+			}
 			CreateMissingTables( missingTables )
+		}
 
 		bot.emit('database_ready')
 	} )

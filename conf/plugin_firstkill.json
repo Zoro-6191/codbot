@@ -10,6 +10,9 @@
 // 100 - Superadmin (128)
 // ===================
 {
+    "name": "First Kill Plugin",
+    "desc": "Stores first kills, deaths, TKs and headshots of the game",
+    
     "settings": {
         // enable/disable parts of plugin, self explanatory.
         // use true/false without any quotes

@@ -1,5 +1,5 @@
 {
-    // bot wide info
+    // bot wide settings
     "codbot": 
     {
         "cmd_prefix": "!",
@@ -14,6 +14,7 @@
         // print commands initiated by everyone in console
         "logcommands": true 
     },
+
     // database info
     "mysqldb": 
     {
@@ -23,6 +24,7 @@
         "password": "password",
         "database": "codbot"
     },
+
     // cod4 server info
     "server": 
     {

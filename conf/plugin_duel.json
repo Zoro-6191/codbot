@@ -1,4 +1,7 @@
 {
+    "name": "Duel Plugin",
+    "desc": "Manages duel functionalities between players",
+    
     "commands": {
         "duel": 20,
         "duelcancel": 1,

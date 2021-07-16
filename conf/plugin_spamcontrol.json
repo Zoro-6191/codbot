@@ -1,4 +1,7 @@
 {
+    "name": "Spamcontrol Plugin",
+    "desc": "Controls player chat spam",
+    
     "settings": 
     {
         "max_spamins": 10,  // max_spamins - maximum spam points allowed

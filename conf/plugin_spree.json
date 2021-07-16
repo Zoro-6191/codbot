@@ -10,6 +10,9 @@
 // 100 - Superadmin (128)
 // ===================
 {    
+    "name": "Spree Plugin",
+    "desc": "Manages player K/D sprees",
+    
     "settings": {
         "reset_spree": true,    // Reset spree stats for all clients at map rotation -->
         "notify_deathspree": true
