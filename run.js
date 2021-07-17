@@ -4,6 +4,7 @@ const db = require('./db.js')
 const config = require('./conf')
 const rcon = require('./rcon.js')
 const eventhandler = require('./eventhandler')
+const cmdHandler = require('./commandhandler')
 const client = require('./client.js')
 // TO-DO: CLI args?
 
@@ -26,6 +27,7 @@ eventhandler.bot.once( 'database_ready', ()=> {
     rcon.initRcon()    // create UDP socket for rcon
     client.init()   // global client object
     logread.initLogRead()  // begin reading logfile
+    cmdHandler.init()   // process all incoming commands
 })
 
 // console.log( eventhandler )

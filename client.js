@@ -1,4 +1,4 @@
-// this client stores and updates currently playing clients based on their slot
+// this file stores and updates currently playing clients based on their slot
 const db = require('./db')
 const ErrorHandler = require('./errorhandler')
 
@@ -19,7 +19,7 @@ async function init()
     // if server offline, for now just crash
     if( !(await status.online) )
         return ErrorHandler.fatal(`COD4 Server not online`)
-    else rcon.say(`^1[^3CODBOT^1] ^2Started.\n^7Made by ^2Zoro`)
+    else rcontool.say(`^1[^3CODBOT^1] ^2Started.\n^7Made by ^2Zoro`)
 
     const onlinePlayers = await status.onlinePlayers
 

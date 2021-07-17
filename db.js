@@ -1,6 +1,5 @@
 // this file takes care of mysql database and its connectivity to rest of the project
 // TO-DO: check database integrity
-const { table } = require('console')
 const fs = require('fs')
 const mysql = require('mysql')
 const { exit } = require('process')

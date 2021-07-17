@@ -37,7 +37,7 @@ async function initPlayerConnect( guid, slot, ign )
 
             else if( result[0] === undefined )  // no match in database
             {
-                // here we do pre emission shit like creating basic database entries and updating all info to main client object
+                // here we do pre emission shit like creating basic database rows and updating all info to main client object
 
                 player.emit( 'firstconnect', guid, slot, ign ) // event: firstconnect: guid, slot, ign
             }
@@ -58,6 +58,7 @@ async function initPlayerConnect( guid, slot, ign )
                 player.emit( 'connect', guid, slot, ign ) // event: connect: guid, slot, ign
             }
         } )
+        console.log(`${ign} connected. Slot: ${slot}`);
     }
 }
 
@@ -71,11 +72,13 @@ async function initPlayerDisconnect( guid, slot, ign )
     // then emitting 'disconnect'
 
     // time format in b3 is in 10 digits, which can only be UTC in seconds.
-    rightnow = Math.floor(Date.now()/1000)
+    // rightnow = Math.floor(Date.now()/1000)
 
-    db.connection.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
+    // db.connection.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
     
     client[toString(slot)] = undefined  // should be enough
+
+    console.log(`${ign} disconnected. Slot: ${slot}`);
 
     player.emit( 'disconnect', guid, slot, ign )
 }

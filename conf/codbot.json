@@ -2,8 +2,7 @@
     // bot wide settings
     "codbot": 
     {
-        "cmd_prefix": "!",
-        "cmd_prefix_loud": "@",
+        
         // As to be attached to all bot msgs sent. Although server sided prefix will also be there, which by default is "^2Server: ^7"
         // to remove that, paste this in your server.cfg
         //      seta sv_consayname ""
@@ -13,6 +12,19 @@
         "timezone": "IST",
         // print commands initiated by everyone in console
         "logcommands": true 
+    },
+
+    // command settings
+    "cmd":
+    {
+        "prefix": "!",
+
+        // loud: to use when to print command query to global chat
+        "prefix_loud": "@",
+
+        // commands to bypass
+        // could be useful when 1 specific command is causing problems like errors/misuse
+        "bypass": [ "test", "potty" ]
     },
 
     // database info

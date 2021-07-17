@@ -30,9 +30,12 @@ async function onConnect( guid, slot, ign )
     // update current_clients table?
     // take old name from clients table and push it to aliases table, and update new name in clients table
     // increment connections column in clients table
+
+    console.log(`${ign} Connected. Slot: ${slot}`);
 }
 
 async function onDisconnect( guid, slot, ign )
 {
     // update lastedit/lastseen?
+    console.log(`${ign} disconnected. Slot: ${slot}`);
 }
