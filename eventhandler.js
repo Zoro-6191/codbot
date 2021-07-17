@@ -22,11 +22,11 @@ function initEventHandler()
 async function initPlayerConnect( guid, slot, ign )
 {
     const db = require('./db')
-    const { client } = require('./client')
+    const { client, updateClientInfo } = require('./client')
     player = module.exports.player
 
     // check if it's player's first connect of session and first time ever joining the server, and emit 2 unrelated events for it
-    if( client[toString(slot)] === undefined )   // if that slot is empty in our client object, it must mean it's the players first connect of session.
+    if( client["s"+slot] == undefined )   // if that slot is empty in our client object, it must mean it's the players first connect of session.
     {
         // now to check if it's player's first ever connection to server, must make mysql query checking guid existance
         db.connection.query( `SELECT * FROM clients WHERE guid=${guid}`, ( error, result )=>
@@ -37,8 +37,6 @@ async function initPlayerConnect( guid, slot, ign )
 
             else if( result[0] === undefined )  // no match in database
             {
-                // here we do pre emission shit like creating basic database rows and updating all info to main client object
-
                 player.emit( 'firstconnect', guid, slot, ign ) // event: firstconnect: guid, slot, ign
             }
             else    // match in db, entry exists
@@ -51,14 +49,15 @@ async function initPlayerConnect( guid, slot, ign )
                 updateClientInfo( slot, "noc", result[0].connections )
                 updateClientInfo( slot, "group_bits", result[0].group_bits )
                 updateClientInfo( slot, "mask_level", result[0].mask_level )
-                updateClientInfo( slot, "firstconnecttime", result[0].time_add )
+                updateClientInfo( slot, "time_add", result[0].time_add )
                 updateClientInfo( slot, "time_edit", result[0].time_edit )
                 updateClientInfo( slot, "greeting", result[0].greeting )
 
                 player.emit( 'connect', guid, slot, ign ) // event: connect: guid, slot, ign
             }
+            // console.log(client)
         } )
-        console.log(`${ign} connected. Slot: ${slot}`);
+        // console.log(`${ign} connected. Slot: ${slot}`);
     }
 }
 
@@ -75,9 +74,9 @@ async function initPlayerDisconnect( guid, slot, ign )
     // rightnow = Math.floor(Date.now()/1000)
 
     // db.connection.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
-    
-    client[toString(slot)] = undefined  // should be enough
-
+    console.log(client)
+    client["s"+slot] = undefined  // should be enough
+    console.log(client)
     console.log(`${ign} disconnected. Slot: ${slot}`);
 
     player.emit( 'disconnect', guid, slot, ign )

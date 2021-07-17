@@ -138,6 +138,7 @@ function initConf()
                 command[cmd].usage = plugin[pl].commandusage[cmd]
             })
     })
+    module.exports.command = command
 
     bot.emit('config_ready')
     console.log("Initialized: Config")

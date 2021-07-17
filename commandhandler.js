@@ -27,6 +27,7 @@ async function init()
 
 async function processChatforCMD( guid, slot, ign, content )
 {
+    const { command } = require('./conf')
     content = content.trim()    // remove extra white spaces from front and back
 
     // get out if prefix not there
@@ -48,5 +49,7 @@ async function processChatforCMD( guid, slot, ign, content )
     // now to find if that command is in any of the plugins' config, even as alias
     // if alias, point to correct command
 
-    
+    if( command[cmd] == undefined )
+        console.log(`Unknown command ${cmd}`)
+    else console.log(`Command "${cmd}" matched from plugin "${command[cmd].plugin}"`)
 }
