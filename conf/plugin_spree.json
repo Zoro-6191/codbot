@@ -35,6 +35,6 @@
         "spree": "Find K/D spree of yourself/player"
     },
     "commandusage": {
-        "spree": "^7&prefix^7spree <player>"
+        "spree": "^7%prefix%^7spree <player>"
     }
 }

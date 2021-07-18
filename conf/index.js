@@ -73,7 +73,7 @@ function initConf()
     // console.log(pluginArr)
 
     // now to create command object
-    command = {}
+    command = []
     // command obj will have
     // name:
     // alias?:
@@ -92,50 +92,22 @@ function initConf()
         // console.log( plugin[pl].name )
         if( plugin[pl].commands == undefined )
             return
-        
+
         Object.keys( plugin[pl].commands ).forEach( cmd =>
             {
                 // console.log( `${cmd}: ` + plugin[pl].commands[cmd])
+                command[command.length] = {}
+                var index = command.length - 1
 
-                command[cmd] = {}
-                
-                command[cmd].minpower = plugin[pl].commands[cmd]
-                command[cmd].plugin = pl
-            })
+                command[index].name = cmd
+                command[index].minpower = plugin[pl].commands[cmd]
+                command[index].plugin = pl
 
-        // for command alias
-        if( plugin[pl].commandalias!=undefined )
-            Object.keys( plugin[pl].commandalias ).forEach( cmd =>
-                {
-                    if( command[cmd] == undefined )
-                        return
+                if( plugin[pl].commandalias != undefined && plugin[pl].commandalias[cmd] != undefined )
+                    command[index].alias = plugin[pl].commandalias[cmd]
 
-                    // console.log(`Alias for "${cmd}": "${plugin[pl].commandalias[cmd]}"`)
-                    command[cmd].alias = plugin[pl].commandalias[cmd]
-                })
-
-        // for command help
-        Object.keys( plugin[pl].commandhelp ).forEach( cmd =>
-            {
-                if( command[cmd] == undefined )
-                    return
-                
-                if( plugin[pl].commandhelp[cmd] == undefined )
-                    ErrorHandler.minor(`Warning: Help message not configured for command "${cmd}" of plugin "${pl}".\nYou need to specify it in "commandhelp" section of "conf/plugin_${pl}.json"`)
-
-                command[cmd].help = plugin[pl].commandhelp[cmd]
-            })
-
-        // for command usage
-        Object.keys( plugin[pl].commandhelp ).forEach( cmd =>
-            {
-                if( command[cmd] == undefined )
-                    return
-                
-                if( plugin[pl].commandusage[cmd] == undefined )
-                    ErrorHandler.minor(`Warning: Command Usage not specified for command "${cmd}" of plugin "${pl}".\nYou need to specify it in "commandusage" section of "conf/plugin_${pl}.json"`)
-
-                command[cmd].usage = plugin[pl].commandusage[cmd]
+                command[index].help = plugin[pl].commandhelp[cmd]
+                command[index].usage = plugin[pl].commandusage[cmd]
             })
     })
     module.exports.command = command

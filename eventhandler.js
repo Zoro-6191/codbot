@@ -22,8 +22,17 @@ function initEventHandler()
 async function initPlayerConnect( guid, slot, ign )
 {
     const db = require('./db')
+    const { rcontool } = require('./rcon')
     const { client, updateClientInfo } = require('./client')
+    
     player = module.exports.player
+
+    const status = await rcontool.rconStatus()
+    const onlinePlayers = await status.onlinePlayers
+    var match = onlinePlayers.find( zz => zz.num == slot )
+
+    var ip = match.ip
+    var steamid = match.steamId
 
     // check if it's player's first connect of session and first time ever joining the server, and emit 2 unrelated events for it
     if( client["s"+slot] == undefined )   // if that slot is empty in our client object, it must mean it's the players first connect of session.
@@ -31,12 +40,30 @@ async function initPlayerConnect( guid, slot, ign )
         // now to check if it's player's first ever connection to server, must make mysql query checking guid existance
         db.connection.query( `SELECT * FROM clients WHERE guid=${guid}`, ( error, result )=>
         {
-            const { updateClientInfo } = require('./client')
             if( error || result === undefined )
                 return ErrorHandler.fatal( error? error : `Query returned undefined when it should have returned atleast empty set` )  // can't skip this. bot has to shut down.
 
             else if( result[0] === undefined )  // no match in database
             {
+                // now we create db entries
+
+                db.connection.query(`INSERT INTO clients ( ip, connections, guid, name, time_add ) 
+                    VALUES ( '${ip}', 1, '${guid}', '${ign}', UNIX_TIMESTAMP() )`, ( err, result )=>
+                    {
+                        if(err)
+                            ErrorHandler.fatal(err)
+                        else updateClientInfo( slot, "id", result.insertId )    // not 100% sure, but looks like this is it
+                    })
+
+                updateClientInfo( slot, "noc", 1 )
+                updateClientInfo( slot, "group_bits", 0 )
+                updateClientInfo( slot, "mask_level", 0 )
+                updateClientInfo( slot, "time_add", Math.floor(Date.now()/1000) )
+                updateClientInfo( slot, "time_edit", 0 )
+                updateClientInfo( slot, "greeting", "" )
+                updateClientInfo( slot, "ip", ip )
+                updateClientInfo( slot, "steamid", steamid )
+
                 player.emit( 'firstconnect', guid, slot, ign ) // event: firstconnect: guid, slot, ign
             }
             else    // match in db, entry exists
@@ -74,9 +101,9 @@ async function initPlayerDisconnect( guid, slot, ign )
     // rightnow = Math.floor(Date.now()/1000)
 
     // db.connection.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
-    console.log(client)
+
     client["s"+slot] = undefined  // should be enough
-    console.log(client)
+
     console.log(`${ign} disconnected. Slot: ${slot}`);
 
     player.emit( 'disconnect', guid, slot, ign )

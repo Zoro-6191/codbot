@@ -31,9 +31,9 @@
         "firsths": "Know the first headshot of game"
     },
     "commandusage": {
-        "firstkill": "^7&prefix^7firstkill",
-        "firsttk": "^7&prefix^7firsttk",
-        "firsths": "^7&prefix^7firsths"
+        "firstkill": "^7%prefix%^7firstkill",
+        "firsttk": "^7%prefix%^7firsttk",
+        "firsths": "^7%prefix%^7firsths"
     },
     "messages": {
         // Placeholders:

@@ -22,13 +22,15 @@ async function init()
     prefix = conf.cmd.prefix
     prefix_loud = conf.cmd.prefix_loud
 
-    player.on('say/sayteam', ( guid, slot, ign, content )=> processChatforCMD( guid, slot, ign, content ) )
+    player.on('say/sayteam', ( guid, slot, ign, content ) => processChatforCMD( guid, slot, ign, content ) )
 }
 
 async function processChatforCMD( guid, slot, ign, content )
 {
     const { command } = require('./conf')
-    content = content.trim()    // remove extra white spaces from front and back
+
+    // remove extra white spaces from front and back
+    content = content.trim()    
 
     // get out if prefix not there
     if( content[0] != prefix && content[0] != prefix_loud )
@@ -48,8 +50,11 @@ async function processChatforCMD( guid, slot, ign, content )
 
     // now to find if that command is in any of the plugins' config, even as alias
     // if alias, point to correct command
+    
+    var checkname = command.find( zz => zz.name == cmd )
+    var checkalias = command.find( zz => zz.alias == cmd )
 
-    if( command[cmd] == undefined )
+    if( checkname == undefined && checkalias == undefined )
         console.log(`Unknown command ${cmd}`)
-    else console.log(`Command "${cmd}" matched from plugin "${command[cmd].plugin}"`)
+    else console.log(`Command "${cmd}" matched from plugin "${(checkname?checkname:checkalias).plugin}"`)
 }

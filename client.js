@@ -43,41 +43,8 @@ async function init()
     // console.log(eventhandler)
 
     // now we begin with events
-    player.on( 'firstconnect', ( guid, slot, ign ) => onFirstConnect( guid, slot, ign ) )
     player.on( 'connect', ( guid, slot, ign ) => onConnect( guid, slot, ign ) )
     // player.on( 'disconnect', ( guid, slot, ign ) => onDisconnect( guid, slot, ign ) )
-}
-
-async function onFirstConnect( guid, slot, ign )
-{
-    const { rcontool } = require('./rcon')
-
-    const status = await rcontool.rconStatus()
-    const onlinePlayers = await status.onlinePlayers
-    var match = onlinePlayers.find( zz => zz.num == slot )
-
-    var ip = match.ip
-    var steamid = match.steamId
-
-    // now we create db entries
-
-    // db.connection.query(
-    //     `INSERT INTO clients
-    //     ( ip, connections, guid, pb_id, name, time_add )
-    //     VALUES ( )`)
-
-    updateClientInfo( slot, "name", ign )
-    updateClientInfo( slot, "guid", guid )
-    updateClientInfo( slot, "noc", 1 )
-    updateClientInfo( slot, "group_bits", 0 )
-    updateClientInfo( slot, "mask_level", 0 )
-    updateClientInfo( slot, "time_add", Math.floor(Date.UTC()/1000) )
-    updateClientInfo( slot, "time_edit", 0 )
-    updateClientInfo( slot, "greeting", "" )
-    updateClientInfo( slot, "ip", ip )
-    updateClientInfo( slot, "steamid", steamid )
-
-    console.log(client["s"+slot])
 }
 
 async function onConnect( guid, slot, ign )
@@ -94,7 +61,7 @@ async function onConnect( guid, slot, ign )
     for( i=0; i < onlinePlayers.length; i++ )
         if( onlinePlayers[i].num == slot )
         {
-            updateClientInfo( slot, "score", onlinePlayers[i].score )
+            updateClientInfo( slot, "score", onlinePlayers[i].score )   // needed?
             updateClientInfo( slot, "ping", onlinePlayers[i].ping )
             updateClientInfo( slot, "steamid", onlinePlayers[i].steamId )
             updateClientInfo( slot, "ip", onlinePlayers[i].ip )
@@ -138,7 +105,6 @@ async function onConnect( guid, slot, ign )
             updateClientInfo( slot, "ratio", 1.0 )
             updateClientInfo( slot, "skill", 1000.0 )
         }
-        console.log(module.exports.client)
     })
 }
 

@@ -50,10 +50,10 @@
         "isp": "Know ISP of player."
     },
     "commandusage": {
-        "greeting": "^7&prefix^7greeting <text>",
-        "distance": "^7&prefix^7distance <player>",
-        "locate": "^7&prefix^7locate <player>",
-        "isp": "^7&prefix^7isp <player>"
+        "greeting": "^7%prefix%^7greeting <text>",
+        "distance": "^7%prefix%^7distance <player>",
+        "locate": "^7%prefix%^7locate <player>",
+        "isp": "^7%prefix%^7isp <player>"
     },
     "messages": {
         // Welcome messages. In those messages you can use the following placeholders:
