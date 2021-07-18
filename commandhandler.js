@@ -10,6 +10,8 @@ module.exports =
 async function init()
 {
     const { player } = require('./eventhandler')
+    const { rcontool } = require('./rcon')
+    const { plugin, command } = require('./conf')
 
     // firstly we map commands to plugins, done through conf module - done
     // then parse actual commands outta say/sayteam event in this module
@@ -22,13 +24,11 @@ async function init()
     prefix = conf.cmd.prefix
     prefix_loud = conf.cmd.prefix_loud
 
-    player.on('say/sayteam', ( guid, slot, ign, content ) => processChatforCMD( guid, slot, ign, content ) )
+    player.on('say/sayteam', ( guid, slot, ign, content ) => processChatforCMD( guid, slot, ign, content, rcontool, command, plugin ) )
 }
 
-async function processChatforCMD( guid, slot, ign, content )
+async function processChatforCMD( guid, slot, ign, content, rcontool, command, plugin )
 {
-    const { command } = require('./conf')
-
     // remove extra white spaces from front and back
     content = content.trim()    
 
@@ -44,6 +44,7 @@ async function processChatforCMD( guid, slot, ign, content )
     var cmd = [...content[0]]  // make array 
     cmd.shift() // remove prefix
     cmd = cmd.join('')  // make string
+    cmd = cmd.toLowerCase()
 
     var cmdargs = content
     cmdargs.shift()    // arguments will be an array so any number of args are possible
@@ -55,6 +56,8 @@ async function processChatforCMD( guid, slot, ign, content )
     var checkalias = command.find( zz => zz.alias == cmd )
 
     if( checkname == undefined && checkalias == undefined )
-        console.log(`Unknown command ${cmd}`)
+        rcontool.tell( slot, plugin.admin.messages.cmd_err_unknown_cmd.replace('%cmd%',cmd).replace('%prefix%',prefix) )
     else console.log(`Command "${cmd}" matched from plugin "${(checkname?checkname:checkalias).plugin}"`)
+
+    // now to send command to plugin to execute
 }

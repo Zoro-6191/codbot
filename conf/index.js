@@ -99,12 +99,12 @@ function initConf()
                 command[command.length] = {}
                 var index = command.length - 1
 
-                command[index].name = cmd
+                command[index].name = cmd.toLowerCase()
                 command[index].minpower = plugin[pl].commands[cmd]
                 command[index].plugin = pl
 
                 if( plugin[pl].commandalias != undefined && plugin[pl].commandalias[cmd] != undefined )
-                    command[index].alias = plugin[pl].commandalias[cmd]
+                    command[index].alias = plugin[pl].commandalias[cmd].toLowerCase()
 
                 command[index].help = plugin[pl].commandhelp[cmd]
                 command[index].usage = plugin[pl].commandusage[cmd]
