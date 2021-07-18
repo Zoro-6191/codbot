@@ -1,17 +1,24 @@
 // commands: xlrstats, xlrhide, xlrtopstats
 
 const db = require('./db')
-const { player } = require('./evenhandler')
-const { client, updateClientInfo } = require('../client')
+const ErrorHandler = require('../errorhandler')
 
-module.exports = 
+module.exports.init = async function()
 {
-    name: 'XLR Plugin',
-    description: `Used to store K/D of players.`,
-    init
+    
 }
 
-async function init()
+module.exports.cmd_xlrstats()
+{
+    
+}
+
+module.exports.cmd_xlrhide()
+{
+    
+}
+
+module.exports.cmd_xlrtopstats()
 {
     
 }

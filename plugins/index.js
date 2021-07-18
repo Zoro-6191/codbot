@@ -1,6 +1,6 @@
+const ErrorHandler = require('../errorhandler')
 
-
-module.exports = 
+module.exports.init = async function()
 {
     
 }

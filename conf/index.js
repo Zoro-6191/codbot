@@ -106,8 +106,13 @@ function initConf()
                 if( plugin[pl].commandalias != undefined && plugin[pl].commandalias[cmd] != undefined )
                     command[index].alias = plugin[pl].commandalias[cmd].toLowerCase()
 
-                command[index].help = plugin[pl].commandhelp[cmd]
-                command[index].usage = plugin[pl].commandusage[cmd]
+                if( plugin[pl].commandhelp != undefined && plugin[pl].commandhelp[cmd] == undefined )
+                    ErrorHandler.warning(`Help message not defined for command "${cmd}" of plugin "${pl}"`)
+                else command[index].help = plugin[pl].commandhelp[cmd]
+
+                if( plugin[pl].commandusage != undefined && plugin[pl].commandusage[cmd] == undefined )
+                    ErrorHandler.warning(`Command Usage not defined for command "${cmd} of plugin "${pl}"`)
+                else command[index].usage = plugin[pl].commandusage[cmd]
             })
     })
     module.exports.command = command

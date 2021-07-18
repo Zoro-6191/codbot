@@ -92,9 +92,6 @@ module.exports =
 						})
 					}
 					else { ErrorHandler.minor(`Can't continue without a database. Quitting...`);exit(1); }
-
-					// for now.
-					bot.emit('database_ready')
 				})
 			}
 			
@@ -140,7 +137,7 @@ function DBExistsGoAhead()
 	var missingTables = []
 
 	// now to check what tables exists and what not
-	module.exports.connection.query( `SHOW TABLES;`, (err, result)=> {
+	module.exports.connection.query( `SHOW TABLES;`, async (err, result)=> {
 		if( err )
 			ErrorHandler.fatal(err)
 		else if( result.length == 0 )
@@ -167,14 +164,14 @@ function DBExistsGoAhead()
 				console.log(`Current Tables:`)
 				console.log(currentTables)
 			}
-			CreateMissingTables( missingTables )
+			await CreateMissingTables( missingTables )
 		}
 
 		bot.emit('database_ready')
 	} )
 }
 
-function CreateMissingTables( missingTables )
+async function CreateMissingTables( missingTables )
 {
 	console.log(`Missing Tables:`)
 	console.log(missingTables)
@@ -187,18 +184,18 @@ function CreateMissingTables( missingTables )
 		const table = missingTables[i]
 		var template = fs.readFileSync(`./sql/templates/${table}.sql`,'utf-8')
 
-		module.exports.connection.query( template, (err, result)=>{
+		module.exports.connection.query( template, async (err, result)=>{
 			if(err)
 				ErrorHandler.fatal(err)
 			else console.log(`Created Table: "${table}"`);
 
 			if( table == 'groups')
-				initGroupTable()
+				await initGroupTable()
 		} )
 	}
 }
 
-function initGroupTable()
+async function initGroupTable()
 {
 	var rl = require('readline').createInterface( {input: fs.createReadStream('./sql/templates/defaultgroups.sql'), output: process.stdout, terminal: false } );
 	rl.on( 'line', (line)=>{

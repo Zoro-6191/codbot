@@ -25,7 +25,12 @@ async function onDisconnect( guid, slot, ign )
     // update lastedit/lastseen?
 }
 
+module.exports.cmd_aliases()
+{
+    
+}
+
 module.exports.cmd_iamgod = async function()
 {
-
+    console.log('I am inevitable')
 }

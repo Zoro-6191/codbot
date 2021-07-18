@@ -5,8 +5,41 @@ const ErrorHandler = require('./errorhandler')
 module.exports = 
 {
     init,
+    getClientInfo,
     updateClientInfo
 }
+
+// ======= client object:
+//
+// s0: {
+//     assists:
+//     deaths:
+//     id:
+//     ip:
+//     kills:
+//     greeting:
+//     group_bits:
+//     group_level:
+//     group_name:
+//     group_token:
+//     guid:
+//     last_ip:
+//     last_name:
+//     name:
+//     noc:
+//     masked_level:
+//     ping:
+//     ratio:
+//     registered:
+//     score:
+//     skill:
+//     steamid:
+//     suicides:
+//     teamdeaths:
+//     time_add:
+//     time_edit:
+//     tk:
+// }
 
 async function init()
 {
@@ -31,7 +64,7 @@ async function init()
     {
         var slot = onlinePlayers[i].num    // we need slot num which is always unordered in
         updateClientInfo( slot, "name", onlinePlayers[i].name )
-        updateClientInfo( slot, "score", onlinePlayers[i].score )
+        updateClientInfo( slot, "score", onlinePlayers[i].score )   // needed?
         updateClientInfo( slot, "ping", onlinePlayers[i].ping )
         updateClientInfo( slot, "guid", onlinePlayers[i].id )
         updateClientInfo( slot, "steamid", onlinePlayers[i].steamId )
@@ -108,7 +141,18 @@ async function onConnect( guid, slot, ign )
     })
 }
 
-async function updateClientInfo( slot, str, value )
+async function getClientInfo( slot, property )
+{
+    if( module.exports.client == undefined )
+        return undefined
+        
+    if( module.exports.client["s"+slot] == undefined )
+        return undefined
+        
+    return module.exports.client["s"+slot][property]
+}
+
+async function updateClientInfo( slot, property, value )
 {
     if( module.exports.client == undefined )
         module.exports.client = {}
@@ -116,8 +160,8 @@ async function updateClientInfo( slot, str, value )
     if( module.exports.client["s"+slot] == undefined )
         module.exports.client["s"+slot] = {}
 
-    if( slot == undefined || str == undefined || value == undefined )
+    if( slot == undefined || property == undefined || value == undefined )
         return ErrorHandler.minor(`Error in updateClientInfo(): one of the args was undefined.\nSLOT: ${slot}\nProperty: ${str}\nValue: ${value}`)
 
-    module.exports.client["s"+slot][str] = value
+    module.exports.client["s"+slot][property] = value
 }

@@ -11,7 +11,7 @@ async function init()
 {
     const { player } = require('./eventhandler')
     const { rcontool } = require('./rcon')
-    const { plugin, command } = require('./conf')
+    const { mainconfig, plugin, command } = require('./conf')
 
     // firstly we map commands to plugins, done through conf module - done
     // then parse actual commands outta say/sayteam event in this module
@@ -24,20 +24,23 @@ async function init()
     prefix = conf.cmd.prefix
     prefix_loud = conf.cmd.prefix_loud
 
-    player.on('say/sayteam', ( guid, slot, ign, content ) => processChatforCMD( guid, slot, ign, content, rcontool, command, plugin ) )
+    player.on('say/sayteam', ( guid, slot, ign, content ) => processChatforCMD( guid, slot, ign, content, rcontool, mainconfig, command, plugin ) )
 }
 
-async function processChatforCMD( guid, slot, ign, content, rcontool, command, plugin )
+async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig, command, plugin )
 {
     // remove extra white spaces from front and back
     content = content.trim()    
+    var mode;
 
     // get out if prefix not there
-    if( content[0] != prefix && content[0] != prefix_loud )
-        return
+    if( content[0] == prefix )
+        mode = 'p'  // 'p' = pm
+    else if( content[0] == prefix_loud )
+        mode = 'g'  // 'g' = global
+    else return // neither of prefixes match
 
-    // now maybe separate command and args
-    
+    // now separate command and args
     content = content.split(' ')
 
     // removal of prefix, for l8r use
@@ -45,6 +48,10 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, command, p
     cmd.shift() // remove prefix
     cmd = cmd.join('')  // make string
     cmd = cmd.toLowerCase()
+
+    // now check if cmd = one of bypassed cmds. return if true
+    if( mainconfig.cmd.bypass.includes(cmd) )
+        return console.log(`Bypassed ${cmd}`)
 
     var cmdargs = content
     cmdargs.shift()    // arguments will be an array so any number of args are possible
@@ -55,9 +62,16 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, command, p
     var checkname = command.find( zz => zz.name == cmd )
     var checkalias = command.find( zz => zz.alias == cmd )
 
-    if( checkname == undefined && checkalias == undefined )
-        rcontool.tell( slot, plugin.admin.messages.cmd_err_unknown_cmd.replace('%cmd%',cmd).replace('%prefix%',prefix) )
-    else console.log(`Command "${cmd}" matched from plugin "${(checkname?checkname:checkalias).plugin}"`)
+    var commandObj = checkname?checkname:checkalias
 
+    if( checkname == undefined && checkalias == undefined )
+        return rcontool.tell( slot, plugin.admin.messages.cmd_err_unknown_cmd.replace('%cmd%',cmd).replace('%prefix%',prefix) )
+    else console.log(`Command "${cmd}" matched from plugin "${commandObj.plugin}"`)
+
+    // now check if that plugin is enabled
+    if( !mainconfig.plugin[commandObj.plugin] )
+        return rcontool.tell( slot, plugin.admin.messages.cmd_err_plugin_disabled.replace('%cmd%',cmd).replace('%plugin%',commandObj.plugin) )
+    
     // now to send command to plugin to execute
+    // require(`./plugins/${plugin[commandObj.plugin]}.js`)["cmd_"+commandObj.name]( slot, mode, cmd, cmdargs )
 }

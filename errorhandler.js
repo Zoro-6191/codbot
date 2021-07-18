@@ -13,5 +13,9 @@ module.exports =
         console.error(error)
         console.error('Bot will shut down ====================================')
         exit(1)
+    },
+    warning: function( warning )
+    {
+        console.log(`WARNING: ${warning}`)
     }
 }
