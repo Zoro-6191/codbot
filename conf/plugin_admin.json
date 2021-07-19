@@ -237,6 +237,7 @@
     },
     "messages": 
     {
+        "cmd_err_processing_cmd": "Error processing your command",
         "cmd_err_unknown_cmd": "^7Unknown command ^1%cmd%^7. Type ^7%prefix%^7h ^7for complete list of commands.",
         "cmd_err_invalidparams": "^7Invalid parameters",
         "cmd_err_noaccess": "^7You need to be in group ^1&groupname ^7to use ^3&prefix^3%cmd%",

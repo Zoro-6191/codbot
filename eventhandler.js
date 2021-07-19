@@ -38,7 +38,7 @@ async function initPlayerConnect( guid, slot, ign )
     if( client["s"+slot] == undefined )   // if that slot is empty in our client object, it must mean it's the players first connect of session.
     {
         // now to check if it's player's first ever connection to server, must make mysql query checking guid existance
-        db.connection.query( `SELECT * FROM clients WHERE guid=${guid}`, ( error, result )=>
+        db.pool.query( `SELECT * FROM clients WHERE guid=${guid}`, ( error, result )=>
         {
             if( error || result === undefined )
                 return ErrorHandler.fatal( error? error : `Query returned undefined when it should have returned atleast empty set` )  // can't skip this. bot has to shut down.
@@ -47,7 +47,7 @@ async function initPlayerConnect( guid, slot, ign )
             {
                 // now we create db entries
 
-                db.connection.query(`INSERT INTO clients ( ip, connections, guid, name, time_add ) 
+                db.pool.query(`INSERT INTO clients ( ip, connections, guid, name, time_add ) 
                     VALUES ( '${ip}', 1, '${guid}', '${ign}', UNIX_TIMESTAMP() )`, ( err, result )=>
                     {
                         if(err)
@@ -85,15 +85,12 @@ async function initPlayerConnect( guid, slot, ign )
 
                 player.emit( 'connect', guid, slot, ign ) // event: connect: guid, slot, ign
             }
-            // console.log(client)
         } )
-        // console.log(`${ign} connected. Slot: ${slot}`);
     }
 }
 
 async function initPlayerDisconnect( guid, slot, ign )
 {
-    const db = require('./db')
     const { client } = require('./client')
     player = module.exports.player
     // here we firstly change time_edit in clients table 
@@ -103,7 +100,7 @@ async function initPlayerDisconnect( guid, slot, ign )
     // time format in b3 is in 10 digits, which can only be UTC in seconds.
     // rightnow = Math.floor(Date.now()/1000)
 
-    // db.connection.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
+    // db.pool.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
 
     client["s"+slot] = undefined  // should be enough
 

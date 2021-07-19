@@ -9,24 +9,32 @@
         //      seta sv_contellname ""
         // Alternatively, you can set "botprefix" setting to empty and use those above commands. Or you could use both
         "botprefix": "^1[^3CODBOT^1]^7:",
+
+        // bot timezone
         "timezone": "IST",
-        // print commands initiated by everyone in console
-        "logcommands": true 
+
+        // password for direct superadmin promotion
+        // NEEDED: change this for security reasons
+        "iamgod_pass": "iamgodpassword"
     },
 
     // choose which plugins are enabled
     "plugins":
     {
-        // admin plugin = big daddy plugin. Most of the cmds get processed in here
+        // admin plugin: big daddy plugin. Most of the cmds get processed in here. other plugins might be depending upon this too
         "admin": true,
 
-        // xlrstats plugin = for storing player kills/deaths etc when they're registered
+        // adv plugin: chat advertisements
+        "adv": false,
+
+        // xlrstats plugin: for storing player kills/deaths etc when they're registered
         "xlr": false
     },
 
     // command settings
     "cmd":
     {
+        // regular prefix
         "prefix": "!",
 
         // loud: to use when to print command query to global chat
@@ -34,7 +42,10 @@
 
         // commands to bypass
         // could be useful when 1 specific command is causing problems like errors/misuse
-        "bypass": [ "test", "potty" ]
+        "bypass": [ "test", "potty" ],
+
+        // print commands initiated by everyone in console
+        "logcommands": true
     },
 
     // database info
@@ -51,9 +62,17 @@
     "server": 
     {
         "rcon_ip": "localhost",
+
+        // default cod4 port: 28960
         "port": 28960,
+
+        // rcon pass must be accurate, case sensitive
         "rcon_password": "rconpass",
-        "public_ip": "snr.vfesports.in",    // domain name works too. eg: "143.110.191.162" or "snr.vfesports.in"
-        "logfile": "H:/Games/Call of Duty Modern Warfare/mods/vf_snr_promod-ranked/games_mp.log"    // bot cant work without proper logfile specification
+
+        // domain name works too. eg: "143.110.191.162" or "snr.vfesports.in"
+        "public_ip": "snr.vfesports.in",
+
+        // bot cant work without proper logfile specification
+        "logfile": "H:/Games/Call of Duty Modern Warfare/mods/vf_snr_promod-ranked/games_mp.log"
     }
 }

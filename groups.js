@@ -1,3 +1,5 @@
+// this module takes care of admin groups
+const db = require('./db')
 const ErrorHandler = require('./errorhandler')
 
 module.exports.init = async function()

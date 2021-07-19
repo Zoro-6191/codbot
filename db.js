@@ -26,28 +26,32 @@ module.exports =
 		// now check if user has entered workable entries in config, has to be in sync
 		await checkConfigEntries( mysqldb )
 		
-		// initiate connection
+		// synchronous connection
 		this.connection = mysql.createConnection(
-		{
-			host: mysqldb.host,
-			port: mysqldb.port,
-			user: mysqldb.user,
-			password: mysqldb.password,
-			database: mysqldb.database
-		});
-		// for non database related queries, can't imagine it being used much
+			{
+				host: mysqldb.host,
+				port: mysqldb.port,
+				user: mysqldb.user,
+				password: mysqldb.password,
+				database: mysqldb.database
+			});
+
+		// async connection
+		// parallel queries can be executed
 		this.pool = mysql.createPool(
-		{
-			host: mysqldb.host,
-			port: mysqldb.port,
-			user: mysqldb.user,
-			password: mysqldb.password
-		});
+			{
+				host: mysqldb.host,
+				port: mysqldb.port,
+				user: mysqldb.user,
+				password: mysqldb.password
+			});
+
+		this.query = this.pool.query
 		this.keepAlive();
 
 		// now to check if host/user/pass are correct and database exists and we have access to it:
 		// this.connection.query(`SELECT *  FROM information_schema WHERE TABLE_NAME = "my_table"`)
-		await this.connection.query(`SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${mysqldb.database}'`, ( err, result )=>
+		this.connection.query(`SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${mysqldb.database}'`, ( err, result )=>
 		{
 			if( err != undefined && err.code == 'ECONNREFUSED' )
 				ErrorHandler.fatal( `MySQL Server refused connection.\nThis means either the MySQL server is down or has blocked this IP Address.` )
@@ -70,26 +74,27 @@ module.exports =
 
 						var sql = `CREATE DATABASE ${mysqldb.database};`
 						
-						this.pool.query( sql, (err,result)=> {
-							if( err || result == undefined)
-								ErrorHandler.fatal(`Error while creating database\n${err?err:'Query returned empty object'}`)
-							
-							console.log(`Successful`)
+						this.pool.query( sql, (err,result)=> 
+							{
+								if( err || result == undefined)
+									ErrorHandler.fatal(`Error while creating database\n${err?err:'Query returned empty object'}`)
+								
+								console.log(`Successful`)
 
-							// re-establish connection
-							this.connection = mysql.createConnection(
-								{
-									host: mysqldb.host,
-									port: mysqldb.port,
-									user: mysqldb.user,
-									password: mysqldb.password,
-									database: mysqldb.database
-								});
-							
-							// TO-DO: maybe setup basic tables here n now
-							// aliases, clients, current_clients, current_svars, groups, ipaliases, penalties, xlr?
-							DBExistsGoAhead()
-						})
+								// re-establish connection
+								this.connection = mysql.createConnection(
+									{
+										host: mysqldb.host,
+										port: mysqldb.port,
+										user: mysqldb.user,
+										password: mysqldb.password,
+										database: mysqldb.database
+									});
+
+								// TO-DO: maybe setup basic tables here n now
+								// aliases, clients, current_clients, current_svars, groups, ipaliases, penalties, xlr?
+								DBExistsGoAhead()
+							})
 					}
 					else { ErrorHandler.minor(`Can't continue without a database. Quitting...`);exit(1); }
 				})
@@ -105,10 +110,10 @@ module.exports =
     {
 		setInterval( ()=>
         {
-			this.connection.query('SELECT 1');
+			this.pool.query('SELECT 1');
 		}, 100000 );	// every 100seconds, should be fine
 	},
-	info: function(){ return this.connection }
+	info: function(){ return this.pool }
 }
 
 function checkConfigEntries( mysqldb )
@@ -136,8 +141,18 @@ function DBExistsGoAhead()
 	var currentTables = []
 	var missingTables = []
 
+	// update database in pool
+	module.exports.pool = mysql.createConnection(
+		{
+			host: mysqldb.host,
+			port: mysqldb.port,
+			user: mysqldb.user,
+			password: mysqldb.password,
+			database: mysqldb.database
+		});
+
 	// now to check what tables exists and what not
-	module.exports.connection.query( `SHOW TABLES;`, async (err, result)=> {
+	module.exports.pool.query( `SHOW TABLES;`, async (err, result)=> {
 		if( err )
 			ErrorHandler.fatal(err)
 		else if( result.length == 0 )
@@ -151,6 +166,7 @@ function DBExistsGoAhead()
 		// could only use 'CREATE TABLE IF NOT EXISTS'
 		// but then we won't really know which table was missing
 		// and which ones we needed to insert
+		// and there'll be useless giant queries
 		// all of this is done considering b3 database can be used with codbot
 
 		for( i=0 ; i < requiredTables.length ; i++ )
@@ -159,15 +175,14 @@ function DBExistsGoAhead()
 
 		if( missingTables.length > 0 )
 		{
-			if( currentTables.length > 0 )	// atleast 1 table exists
+			if( currentTables.length > 0 )	// atleast 1 table exists in db
 			{
 				console.log(`Current Tables:`)
 				console.log(currentTables)
 			}
-			await CreateMissingTables( missingTables )
+			CreateMissingTables( missingTables )
 		}
-
-		bot.emit('database_ready')
+		else bot.emit('database_ready')
 	} )
 }
 
@@ -184,34 +199,32 @@ async function CreateMissingTables( missingTables )
 		const table = missingTables[i]
 		var template = fs.readFileSync(`./sql/templates/${table}.sql`,'utf-8')
 
-		module.exports.connection.query( template, async (err, result)=>{
+		module.exports.query( template, async (err, result)=>{
 			if(err)
 				ErrorHandler.fatal(err)
 			else console.log(`Created Table: "${table}"`);
 
 			if( table == 'groups')
-				await initGroupTable()
+				initGroupTable()
 		} )
 	}
+	// worst case scenario: db has 200ms ping to server. 1s should be enough
+	// setTimeout( bot.emit('database_ready'), 1000 )
+	bot.emit('database_ready')
 }
 
-async function initGroupTable()
+function initGroupTable()
 {
 	var rl = require('readline').createInterface( {input: fs.createReadStream('./sql/templates/defaultgroups.sql'), output: process.stdout, terminal: false } );
 	rl.on( 'line', (line)=>{
 
-		module.exports.connection.query( line, (err,result)=>{
+		module.exports.query( line, (err,result)=>{
 			if(err)
 				ErrorHandler.fatal(err)
 		})
 	})
-	rl.on( 'close', ()=> console.log(`Initiated Default Groups:
-	100 - Super Admin
-	80 - Senior Admin
-	60 - Full Admin
-	40 - Admin
-	20 - Moderator
-	2 - Regular
-	1 - User
-	0 - Guest`))
+	rl.on( 'close', ()=> {
+		console.log(`Initiated Default Groups:\n	100 - Super Admin\n	80 - Senior Admin\n	60 - Full Admin\n	40 - Admin\n	20 - Moderator\n	2 - Regular\n	1 - Usern	0 - Guest`)
+
+	})
 }

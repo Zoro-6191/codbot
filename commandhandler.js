@@ -1,4 +1,5 @@
 const ErrorHandler = require('./errorhandler')
+const { sendMsg } = require('./msnger')
 
 var prefix, prefix_loud
 
@@ -30,8 +31,16 @@ async function init()
 async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig, command, plugin )
 {
     // remove extra white spaces from front and back
-    content = content.trim()    
+    // content = content.trim()    
     var mode;
+
+    // teamchat has special blank space everytime, gotta remove it
+    if( content[0] == '\x15' )
+    {
+        content = [...content]
+        content.shift()
+        content = content.join('')
+    }
 
     // get out if prefix not there
     if( content[0] == prefix )
@@ -65,13 +74,23 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig
     var commandObj = checkname?checkname:checkalias
 
     if( checkname == undefined && checkalias == undefined )
-        return rcontool.tell( slot, plugin.admin.messages.cmd_err_unknown_cmd.replace('%cmd%',cmd).replace('%prefix%',prefix) )
+        return sendMsg( 'p', slot, plugin.admin.messages.cmd_err_unknown_cmd.replace('%cmd%',cmd) )
     else console.log(`Command "${cmd}" matched from plugin "${commandObj.plugin}"`)
 
     // now check if that plugin is enabled
-    if( !mainconfig.plugin[commandObj.plugin] )
-        return rcontool.tell( slot, plugin.admin.messages.cmd_err_plugin_disabled.replace('%cmd%',cmd).replace('%plugin%',commandObj.plugin) )
+    if( !mainconfig.plugins[commandObj.plugin] )
+        return sendMsg( 'p', slot, plugin.admin.messages.cmd_err_plugin_disabled.replace('%cmd%',cmd).replace('%plugin%',commandObj.plugin) )
     
     // now to send command to plugin to execute
-    // require(`./plugins/${plugin[commandObj.plugin]}.js`)["cmd_"+commandObj.name]( slot, mode, cmd, cmdargs )
+
+    var cmdF = require(`./plugins/${commandObj.plugin}.js`)["cmd_"+commandObj.name]
+
+    if( cmdF == undefined)
+    {
+        ErrorHandler.warning(`Command Function for command "${commandObj.plugin}" of plugin "${commandObj.plugin}" not defined.`)
+        return sendMsg( 'p', slot, plugin.admin.messages.cmd_err_processing_cmd.replace('%cmd%',cmd) )
+    }
+    cmdF( slot, mode, cmd, cmdargs )
+
+    // maybe emit an event for it
 }

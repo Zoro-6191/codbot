@@ -105,7 +105,7 @@ async function onConnect( guid, slot, ign )
     // kills, deaths, assists, tk, teamdeaths, suicides, roundsplayed, ratio, skill, winstreak, losestreak, xlrhide from xlr_playerstats
 
     // console.log(module.exports.client)
-    db.connection.query(`SELECT * FROM xlr_playerstats WHERE client_id=${ module.exports.client["s"+slot].id }`, ( error, result ) => 
+    db.pool.query(`SELECT * FROM xlr_playerstats WHERE client_id=${ module.exports.client["s"+slot].id }`, ( error, result ) => 
     {
         if( error )
             ErrorHandler.fatal( error )  // can't skip this. bot has to shut down.

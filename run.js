@@ -7,6 +7,7 @@ const eventhandler = require('./eventhandler')
 const cmdHandler = require('./commandhandler')
 const client = require('./client.js')
 const groups = require("./groups.js")
+const msnger = require('./msnger')
 // TO-DO: CLI args?
 
 // =================================================
@@ -24,13 +25,15 @@ eventhandler.initEventHandler() // juice
 config.initConf()   // read all configurations
 db.initMySQLdb()  // can take seconds depending upon database server ping and if it's initial setup
 
-eventhandler.bot.once( 'database_ready', ()=> {
-    groups.init()   // register all admin groups
-    rcon.initRcon()    // create UDP socket for rcon
-    client.init()   // global client object
-    logread.initLogRead()  // begin reading logfile
-    cmdHandler.init()   // process all incoming commands
-})
+eventhandler.bot.once( 'database_ready', ()=> 
+    {
+        groups.init()   // register all admin groups
+        rcon.initRcon()    // create UDP socket for rcon
+        client.init()   // global client object
+        msnger.init()   // chat rcon messenger
+        logread.initLogRead()  // begin reading logfile
+        cmdHandler.init()   // process all incoming commands
+    })
 
 // console.log( eventhandler )
 

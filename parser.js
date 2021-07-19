@@ -1,5 +1,6 @@
 // this file parses each line and makes use outta em
 // events appear to be the best option for independent and togglable plugins
+const eventhandler = require('./eventhandler')
 
 module.exports = 
 {
@@ -45,8 +46,6 @@ async function parseLine( line )
 
         // luckily first word/alphabet is diff in every case, could just do switch
 
-        const eventhandler = require('./eventhandler')
-        
         switch( line[0] )
         {
             case 'J':
