@@ -1,5 +1,4 @@
-// this file takes care of mysql database and its connectivity to rest of the project
-// TO-DO: check database integrity
+// this module takes care of mysql database and its connectivity to rest of the project
 const fs = require('fs')
 const mysql = require('mysql')
 const { exit } = require('process')
@@ -202,29 +201,10 @@ async function CreateMissingTables( missingTables )
 		module.exports.query( template, async (err, result)=>{
 			if(err)
 				ErrorHandler.fatal(err)
-			else console.log(`Created Table: "${table}"`);
-
-			if( table == 'groups')
-				initGroupTable()
+			else console.log(`Created Table: "${table}"`)
 		} )
 	}
 	// worst case scenario: db has 200ms ping to server. 1s should be enough
-	// setTimeout( bot.emit('database_ready'), 1000 )
+	// setTimeout( bot.emit('database_ready'), 1000 )	// dont work for some reason
 	bot.emit('database_ready')
-}
-
-function initGroupTable()
-{
-	var rl = require('readline').createInterface( {input: fs.createReadStream('./sql/templates/defaultgroups.sql'), output: process.stdout, terminal: false } );
-	rl.on( 'line', (line)=>{
-
-		module.exports.query( line, (err,result)=>{
-			if(err)
-				ErrorHandler.fatal(err)
-		})
-	})
-	rl.on( 'close', ()=> {
-		console.log(`Initiated Default Groups:\n	100 - Super Admin\n	80 - Senior Admin\n	60 - Full Admin\n	40 - Admin\n	20 - Moderator\n	2 - Regular\n	1 - Usern	0 - Guest`)
-
-	})
 }

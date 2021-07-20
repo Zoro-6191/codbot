@@ -1,21 +1,26 @@
 const ErrorHandler = require('../errorhandler')
 
-module.exports.init = async function()
+module.exports = 
 {
-    
+    init,
+
+    cmd_duel: async function( slot, mode, cmdargs )
+    {
+
+    },
+
+    cmd_duelreset: async function( slot, mode, cmdargs )
+    {
+
+    },
+
+    cmd_duelcancel: async function( slot, mode, cmdargs )
+    {
+        
+    }
 }
 
-module.exports.cmd_duel()
-{
-    
-}
-
-module.exports.cmd_duelreset()
-{
-    
-}
-
-module.exports.cmd_duelcancel()
+async function init()
 {
     
 }

@@ -2,91 +2,190 @@
 const db = require('./db')
 const ErrorHandler = require('./errorhandler')
 
+// for local use
+var globalGroups, highestLevel
+
 module.exports.init = async function()
 {
-    
+    // check if group table is empty
+    // if empty, init default groups
+    // create global group object, maybe along with methods
+
+    db.pool.query( `SELECT * FROM groups`, (err,result) => {
+        if( err )
+            ErrorHandler.fatal(`Error while creating global Groups object\n${err}`)
+        else if( result.length == 0 )   // no entries exist in table
+        {
+            // insert default groups to table
+            insertDefaultGroups()
+        }
+        else createGlobalGroups( result )
+    })
 }
 
 module.exports.groupOperations = 
 {
     BitsToLevel,
-    BitsToToken,
+    BitsToKeyword,
     BitsToName,
-    TokenToLevel,
-    TokenToBits
+    KeywordToBits,
+    KeywordToLevel,
+    KeywordToName,
+    LevelToBits,
+    LevelToKeyword,
+    LevelToName,
+    updateClientGroup
+}
+
+async function createGlobalGroups( queryResult )
+{
+    globalGroups = []
+    highestLevel = 0
+    
+    Object.keys( queryResult ).forEach( key => 
+    {
+        globalGroups[globalGroups.length] = {}
+        const index = globalGroups.length-1
+
+        Object.keys( queryResult[key] ).forEach( keyx2 => 
+        {
+            globalGroups[index][keyx2=='id'?'bits':keyx2] = queryResult[key][keyx2]
+        })
+
+        // update highest Level
+        if( queryResult[key].level > highestLevel )
+            highestLevel = queryResult[key].level
+    })
+    module.exports.globalGroups = globalGroups
+    module.exports.highestLevel = highestLevel
 }
 
 function BitsToLevel( bits )
 {
-    switch( bits )
-    {
-        case 128: return 100;
-        case 64: return 80;        
-        case 32: return 60;        
-        case 16: return 40;
-        case 8: return 20;        
-        case 2: return 2;
-        case 1: return 1;
-        case 0: return 0;
-    }
+    var obj = globalGroups.find( obj => obj.bits == bits )
+
+    if( obj == undefined )
+        return undefined
+
+    return obj.level
 }
 
-function BitsToToken( bits )
+function BitsToKeyword( bits )
 {
-    switch( bits )
-    {
-        case 128: return "superadmin";
-        case 64: return "senioradmin";        
-        case 32: return "fulladmin";        
-        case 16: return "admin";
-        case 8: return "mod";        
-        case 2: return "reg";
-        case 1: return "user";
-        case 0: return "guest";
-    }
+    
+    var obj = globalGroups.find( obj => obj.bits == bits )
+
+    if( obj == undefined )
+        return undefined
+
+    return obj.keyword
 }
 
 function BitsToName( bits )
 {
-    switch( bits )
-    {
-        case 128: return "Super Admin";
-        case 64: return "Senior Admin";        
-        case 32: return "Full Admin";        
-        case 16: return "Admin";
-        case 8: return "Moderator";        
-        case 2: return "Regular";
-        case 1: return "User";
-        case 0: return "Guest";
-    }
+    var obj = globalGroups.find( obj => obj.bits == bits )
+
+    if( obj == undefined )
+        return undefined
+
+    return obj.name
 }
 
-function TokenToLevel( token )
+function KeywordToName( token )
 {
-    switch( token )
-    {
-        case "superadmin": return 100;
-        case "senioradmin": return 80;        
-        case "fulladmin": return 60;        
-        case "admin": return 40;
-        case "mod": return 20;        
-        case "reg": return 2;
-        case "user": return 1;
-        case "guest": return 0;
-    }
+    // TO-DO: regex l8r
+    token = token.toLowerCase()
+
+    var obj = globalGroups.find( obj => obj.keyword == keyword )
+
+    if( obj == undefined )
+        return undefined
+
+    return obj.name
 }
 
-function TokenToBits( token )
+function KeywordToLevel( token )
 {
-    switch( token )
-    {
-        case "superadmin": return 128;
-        case "senioradmin": return 64;        
-        case "fulladmin": return 32;        
-        case "admin": return 16;
-        case "mod": return 8;        
-        case "reg": return 2;
-        case "user": return 1;
-        case "guest": return 0;
-    }
+    token = token.toLowerCase()
+
+    var obj = globalGroups.find( obj => obj.keyword == keyword )
+
+    if( obj == undefined )
+        return undefined
+
+    return obj.level
+}
+
+function KeywordToBits( token )
+{
+    token = token.toLowerCase()
+
+    var obj = globalGroups.find( obj => obj.keyword == keyword )
+
+    if( obj == undefined )
+        return undefined
+
+    return obj.bits
+}
+
+function LevelToKeyword( level )
+{
+    var obj = globalGroups.find( obj => obj.level == level )
+
+    if( obj == undefined )
+        return undefined
+
+    return obj.keyword
+}
+
+function LevelToName( level )
+{
+    var obj = globalGroups.find( obj => obj.level == level )
+
+    if( obj == undefined )
+        return undefined
+
+    return obj.name
+}
+
+function LevelToBits( level )
+{
+    var obj = globalGroups.find( zz => zz.level == level )
+
+    if( obj == undefined )
+        return undefined
+
+    return obj.bits
+}
+
+async function insertDefaultGroups()
+{
+	var rl = require('readline').createInterface( {input: fs.createReadStream('./sql/templates/defaultgroups.sql'), output: process.stdout, terminal: false } );
+	
+    // read individual line and query it while reading
+    rl.on( 'line', (line)=>
+        {
+            module.exports.query( line, (err,result)=>{
+                if(err)
+                    ErrorHandler.fatal(err)
+            })
+        })
+
+    // notify to console
+	rl.on( 'close', ()=> {
+		console.log(`Initiated Default Groups:\n	100 - Super Admin\n	80 - Senior Admin\n	60 - Full Admin\n	40 - Admin\n	20 - Moderator\n	2 - Regular\n	1 - Usern	0 - Guest`)
+        // now to forward to creating global group object
+        // createGlobalGroups()
+        // just querying again is probably best
+        db.pool.query( `SELECT * FROM groups;`, (err,result)=>{
+            if( err )
+                ErrorHandler.fatal(`Error while creating global Groups object\n${err}`)
+            else createGlobalGroups( result )
+        })
+	})
+}
+
+async function updateClientGroup( slot, group )
+{
+
 }

@@ -1,5 +1,6 @@
-// this file manages all the events and provides accessibility to plugins
+// this module manages all the events and provides accessibility to plugins
 const ErrorHandler = require('./errorhandler')
+const { groupOperations } = require('./groups')
 
 module.exports = 
 {
@@ -59,10 +60,7 @@ async function initPlayerConnect( guid, slot, ign )
                     })
 
                 updateClientInfo( slot, "noc", 1 )
-                updateClientInfo( slot, "group_bits", 0 )
                 updateClientInfo( slot, "group_level", 0 )
-                updateClientInfo( slot, "group_name", "Guest" )
-                updateClientInfo( slot, "group_token", "guest" )
                 updateClientInfo( slot, "mask_level", 0 )
                 updateClientInfo( slot, "time_add", Math.floor(Date.now()/1000) )
                 updateClientInfo( slot, "time_edit", 0 )
@@ -78,11 +76,9 @@ async function initPlayerConnect( guid, slot, ign )
                 // then updating all info to main client object    
                 // then emitting 'connect'   
 
-                // console.log(result[0])
-
                 updateClientInfo( slot, "id", result[0].id )
                 updateClientInfo( slot, "noc", result[0].connections )
-                updateClientInfo( slot, "group_bits", result[0].group_bits )
+                updateClientInfo( slot, "group_level", groupOperations.BitsToLevel(result[0].group_bits) )
                 updateClientInfo( slot, "mask_level", result[0].mask_level )
                 updateClientInfo( slot, "time_add", result[0].time_add )
                 updateClientInfo( slot, "time_edit", result[0].time_edit )

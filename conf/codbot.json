@@ -14,18 +14,52 @@
         "timezone": "IST",
 
         // password for direct superadmin promotion
+        // Spaces not allowed, case sensitive
         // NEEDED: change this for security reasons
         "iamgod_pass": "iamgodpassword"
     },
 
-    // choose which plugins are enabled
+    // choose which plugins are enabled (true/false without quotes)
     "plugins":
     {
-        // admin plugin: big daddy plugin. Most of the cmds get processed in here. other plugins might be depending upon this too
+        // admin plugin: big daddy plugin. Most of the cmds get processed in here. other plugins might be depending upon this plugin too
         "admin": true,
 
         // adv plugin: chat advertisements
         "adv": false,
+
+        // afk plugin: takes care of afk players
+        "afk": false,
+
+        // callvote plugin: takes care of all vote calling
+        "callvote": false,
+
+        // customcommands plugin: editor defined new commands
+        "customcommands": false,
+
+        // duel plugin: duel among players using special commands
+        "duel": false,
+
+        // firstkill plugin: announce firstkills of rounds
+        "firstkill": false,
+
+        // geolocation plugin: welcoming players and commands like !locate and !isp
+        "geolocation": false,
+
+        // ipban plugin: IP ban players and cheaters
+        "ipban": false,
+
+        // pingwatch plugin: watch players' pings
+        "pingwatch": false,
+
+        // spamcontrol plugin: control chat spams
+        "spamcontrol": false,
+
+        // spawnkill plugin: control spawnkillings
+        "spawnkill": false,
+
+        // spree plugin: watch over player kill/death sprees
+        "spree": false,
 
         // xlrstats plugin: for storing player kills/deaths etc when they're registered
         "xlr": false

@@ -23,10 +23,7 @@ module.exports =
 //         ip:
 //         kills:
 //         greeting:
-//         group_bits:
 //         group_level:
-//         group_name:
-//         group_token:
 //         guid:
 //         last_ip:
 //         last_name:
@@ -81,9 +78,7 @@ async function init()
     // TO-DO: update database stuff right here and now too
     // can be a bit heavy but should work
 
-    // player = eventhandler.player
     const player = require('./eventhandler').player
-    // console.log(eventhandler)
 
     // now we begin with events
     player.on( 'connect', ( guid, slot, ign ) => onConnect( guid, slot, ign ) )
@@ -116,7 +111,6 @@ async function onConnect( guid, slot, ign )
     // aliascount, penaltiescount, ipaliascount
     // kills, deaths, assists, tk, teamdeaths, suicides, roundsplayed, ratio, skill, winstreak, losestreak, xlrhide from xlr_playerstats
 
-    // console.log(module.exports.client)
     db.pool.query(`SELECT * FROM xlr_playerstats WHERE client_id=${ clientObj.id }`, ( error, result ) => 
     {
         if( error )
@@ -152,8 +146,6 @@ async function onConnect( guid, slot, ign )
         }
         console.log(client)
     })
-    // console.log(clientObj)
-    // console.log(client)
 }
 
 // get whole clientObj of 1 player matching by slot

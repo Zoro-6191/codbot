@@ -5,7 +5,7 @@ module.exports.init = async function()
     
 }
 
-module.exports.cmd_afk = async function( slot, mode, cmd, cmdargs )
+module.exports.cmd_afk = async function( slot, mode, cmdargs )
 {
     
 }

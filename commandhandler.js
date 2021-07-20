@@ -90,7 +90,7 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig
         ErrorHandler.warning(`Command Function for command "${commandObj.name}" of plugin "${commandObj.plugin}" not defined.`)
         return sendMsg( 'p', slot, plugin.admin.messages.cmd_err_processing_cmd.replace('%cmd%',cmd) )
     }
-    cmdF( slot, mode, cmd, cmdargs )
+    cmdF( slot, mode, cmdargs )
 
     // maybe emit an event for it
 }

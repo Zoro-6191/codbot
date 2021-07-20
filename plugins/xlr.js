@@ -3,22 +3,27 @@
 const db = require('./db')
 const ErrorHandler = require('../errorhandler')
 
-module.exports.init = async function()
+module.exports = 
 {
-    
+    init,
+
+    cmd_xlrstats: async function( slot, mode, cmdargs )
+    {
+
+    },
+
+    cmd_xlrhide: async function( slot, mode, cmdargs )
+    {
+
+    },
+
+    cmd_xlrtopstats: async function( slot, mode, cmdargs )
+    {
+        
+    }
 }
 
-module.exports.cmd_xlrstats()
-{
-    
-}
-
-module.exports.cmd_xlrhide()
-{
-    
-}
-
-module.exports.cmd_xlrtopstats()
+async function init()
 {
     
 }

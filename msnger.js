@@ -54,4 +54,5 @@ async function sendMsg( mode, slot, msg )
 async function replacePlaceholder( string, holder, value )
 {
     string = string.replace(holder,value)
+    return string
 }

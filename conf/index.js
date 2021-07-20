@@ -28,6 +28,11 @@ function initConf()
         ErrorHandler.fatal(`Incorrect JSON Syntax found in file: /conf/codbot.json\n${e}`)
     }
 
+    // check if timezone is mentioned correctly
+    var tz = this.mainconfig.codbot.timezone
+    if( tz == undefined || !isValidTimeZone(tz))
+        this.mainconfig.codbot.timezone = 'GMT'
+
     // now to read every other file except codbot.json and index.js
     // or take file names from ../plugins, map them to plugin_(name).json, better
     // then parse it to objects
@@ -119,4 +124,20 @@ function initConf()
 
     bot.emit('config_ready')
     console.log("Initialized: Config")
+}
+
+function isValidTimeZone(tz) 
+{
+    if (!Intl || !Intl.DateTimeFormat().resolvedOptions().timeZone)
+        throw new Error('Time zones are not available in this environment');
+
+    try 
+    {
+        Intl.DateTimeFormat(undefined, {timeZone: tz});
+        return true;
+    }
+    catch (ex) 
+    {
+        return false;
+    }
 }
