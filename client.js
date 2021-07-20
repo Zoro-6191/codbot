@@ -2,50 +2,57 @@
 const db = require('./db')
 const ErrorHandler = require('./errorhandler')
 
+// for local use
+var client
+
 module.exports = 
 {
     init,
     getClientInfo,
+    getClientObj,
     updateClientInfo
 }
 
 // ======= client object:
-//
-// s0: {
-//     assists:
-//     deaths:
-//     id:
-//     ip:
-//     kills:
-//     greeting:
-//     group_bits:
-//     group_level:
-//     group_name:
-//     group_token:
-//     guid:
-//     last_ip:
-//     last_name:
-//     name:
-//     noc:
-//     masked_level:
-//     ping:
-//     ratio:
-//     registered:
-//     score:
-//     skill:
-//     steamid:
-//     suicides:
-//     teamdeaths:
-//     time_add:
-//     time_edit:
-//     tk:
-// }
+// [
+//  // each player has one of these
+//     {
+//         assists:
+//         deaths:
+//         id:
+//         ip:
+//         kills:
+//         greeting:
+//         group_bits:
+//         group_level:
+//         group_name:
+//         group_token:
+//         guid:
+//         last_ip:
+//         last_name:
+//         name:
+//         noc:
+//         masked_level:
+//         ping:
+//         ratio:
+//         registered:
+//         score:
+//         skill:
+//         slot: - primary key
+//         steamid:
+//         suicides:
+//         teamdeaths:
+//         time_add:
+//         time_edit:
+//         tk:
+//     },
+// ]
 
 async function init()
 {
     if( module.exports.client == undefined )
     {
-        client = {} // for simplicity
+        client = [] // for simplicity
         module.exports.client = client
     }
 
@@ -63,6 +70,7 @@ async function init()
     for( i=0; i < onlinePlayers.length; i++ )
     {
         var slot = onlinePlayers[i].num    // we need slot num which is always unordered in
+        updateClientInfo( slot, "slot", slot )
         updateClientInfo( slot, "name", onlinePlayers[i].name )
         updateClientInfo( slot, "score", onlinePlayers[i].score )   // needed?
         updateClientInfo( slot, "ping", onlinePlayers[i].ping )
@@ -70,6 +78,8 @@ async function init()
         updateClientInfo( slot, "steamid", onlinePlayers[i].steamId )
         updateClientInfo( slot, "ip", onlinePlayers[i].ip )
     }
+    // TO-DO: update database stuff right here and now too
+    // can be a bit heavy but should work
 
     // player = eventhandler.player
     const player = require('./eventhandler').player
@@ -84,28 +94,30 @@ async function onConnect( guid, slot, ign )
 {
     // here we add all info to client object of module.exports
     // including query fetched info
+    updateClientInfo( slot, "slot", slot )  // i know
     updateClientInfo( slot, "name", ign )
     updateClientInfo( slot, "guid", guid ) 
-
+    
     const { rcontool } = require('./rcon')
     const status = await rcontool.rconStatus()
     const onlinePlayers = await status.onlinePlayers
-
+    
     for( i=0; i < onlinePlayers.length; i++ )
-        if( onlinePlayers[i].num == slot )
-        {
-            updateClientInfo( slot, "score", onlinePlayers[i].score )   // needed?
-            updateClientInfo( slot, "ping", onlinePlayers[i].ping )
-            updateClientInfo( slot, "steamid", onlinePlayers[i].steamId )
-            updateClientInfo( slot, "ip", onlinePlayers[i].ip )
-        }
-
+    if( onlinePlayers[i].num == slot )
+    {
+        updateClientInfo( slot, "score", onlinePlayers[i].score )   // needed?
+        updateClientInfo( slot, "ping", onlinePlayers[i].ping )
+        updateClientInfo( slot, "steamid", onlinePlayers[i].steamId )
+        updateClientInfo( slot, "ip", onlinePlayers[i].ip )
+    }
+    
+    var clientObj = client.find( cl => cl.slot == slot )
     // now fetching info from query
     // aliascount, penaltiescount, ipaliascount
     // kills, deaths, assists, tk, teamdeaths, suicides, roundsplayed, ratio, skill, winstreak, losestreak, xlrhide from xlr_playerstats
 
     // console.log(module.exports.client)
-    db.pool.query(`SELECT * FROM xlr_playerstats WHERE client_id=${ module.exports.client["s"+slot].id }`, ( error, result ) => 
+    db.pool.query(`SELECT * FROM xlr_playerstats WHERE client_id=${ clientObj.id }`, ( error, result ) => 
     {
         if( error )
             ErrorHandler.fatal( error )  // can't skip this. bot has to shut down.
@@ -138,30 +150,68 @@ async function onConnect( guid, slot, ign )
             updateClientInfo( slot, "ratio", 1.0 )
             updateClientInfo( slot, "skill", 1000.0 )
         }
+        console.log(client)
     })
+    // console.log(clientObj)
+    // console.log(client)
 }
 
+// get whole clientObj of 1 player matching by slot
+async function getClientObj( slot )
+{
+    if( client == undefined )
+        return undefined
+    
+    var clientObj = client.find( client => client.slot == slot )
+    
+    if( clientObj == undefined )
+        return undefined
+
+    return clientObj
+}
+
+// return 1 property of the clientObj which matches the slot
 async function getClientInfo( slot, property )
 {
-    if( module.exports.client == undefined )
+    if( client == undefined )
+        return undefined
+
+    var clientObj = client.find( client => client.slot == slot )
+        
+    if( clientObj == undefined )
         return undefined
         
-    if( module.exports.client["s"+slot] == undefined )
-        return undefined
-        
-    return module.exports.client["s"+slot][property]
+    return clientObj[property]
 }
 
+// update 1 property of the clientObj which matches slot
 async function updateClientInfo( slot, property, value )
 {
-    if( module.exports.client == undefined )
-        module.exports.client = {}
+    if( client == undefined )
+        client = []
 
-    if( module.exports.client["s"+slot] == undefined )
-        module.exports.client["s"+slot] = {}
+    var clientObj = client.find( client => client.slot == slot )
+
+    // create new entry if empty
+    if( clientObj == undefined )
+    {
+        client[client.length] = {}
+        clientObj = client[client.length-1]
+        clientObj.slot = slot
+    }
 
     if( slot == undefined || property == undefined || value == undefined )
-        return ErrorHandler.minor(`Error in updateClientInfo(): one of the args was undefined.\nSLOT: ${slot}\nProperty: ${str}\nValue: ${value}`)
+        return ErrorHandler.minor(`Error in updateClientInfo(): one of the args was undefined.\nSLOT: ${slot}\nProperty: ${property}\nValue: ${value}`)
 
-    module.exports.client["s"+slot][property] = value
+    clientObj[property] = value
+}
+
+// used to convert name substring 
+async function playerSearchFromName( mode, slot, nameStr )
+{
+    // mode = pm/global (!/@)
+    // slot = slot of guy typing the command
+    // nameStr = name guy typed
+
+    // Object.keys( client ).forEach
 }

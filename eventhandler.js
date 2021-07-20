@@ -34,8 +34,10 @@ async function initPlayerConnect( guid, slot, ign )
     var ip = match.ip
     var steamid = match.steamId
 
+    var clientObj = client.find( cl => cl.slot == slot )
+
     // check if it's player's first connect of session and first time ever joining the server, and emit 2 unrelated events for it
-    if( client["s"+slot] == undefined )   // if that slot is empty in our client object, it must mean it's the players first connect of session.
+    if( clientObj == undefined )   // if that slot is empty in our client object, it must mean it's the players first connect of session.
     {
         // now to check if it's player's first ever connection to server, must make mysql query checking guid existance
         db.pool.query( `SELECT * FROM clients WHERE guid=${guid}`, ( error, result )=>
@@ -43,6 +45,7 @@ async function initPlayerConnect( guid, slot, ign )
             if( error || result === undefined )
                 return ErrorHandler.fatal( error? error : `Query returned undefined when it should have returned atleast empty set` )  // can't skip this. bot has to shut down.
 
+            
             else if( result[0] === undefined )  // no match in database
             {
                 // now we create db entries
@@ -75,6 +78,8 @@ async function initPlayerConnect( guid, slot, ign )
                 // then updating all info to main client object    
                 // then emitting 'connect'   
 
+                // console.log(result[0])
+
                 updateClientInfo( slot, "id", result[0].id )
                 updateClientInfo( slot, "noc", result[0].connections )
                 updateClientInfo( slot, "group_bits", result[0].group_bits )
@@ -102,7 +107,9 @@ async function initPlayerDisconnect( guid, slot, ign )
 
     // db.pool.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
 
-    client["s"+slot] = undefined  // should be enough
+    // console.log(client)
+    client.splice( client.indexOf( client.find( clients => clients.slot==slot ) ), 1 )  // should be enough
+    // console.log(client)
 
     console.log(`${ign} disconnected. Slot: ${slot}`);
 

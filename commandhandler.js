@@ -60,7 +60,7 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig
 
     // now check if cmd = one of bypassed cmds. return if true
     if( mainconfig.cmd.bypass.includes(cmd) )
-        return console.log(`Bypassed ${cmd}`)
+        return
 
     var cmdargs = content
     cmdargs.shift()    // arguments will be an array so any number of args are possible
@@ -75,7 +75,7 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig
 
     if( checkname == undefined && checkalias == undefined )
         return sendMsg( 'p', slot, plugin.admin.messages.cmd_err_unknown_cmd.replace('%cmd%',cmd) )
-    else console.log(`Command "${cmd}" matched from plugin "${commandObj.plugin}"`)
+    // else console.log(`Command "${cmd}" matched from plugin "${commandObj.plugin}"`)
 
     // now check if that plugin is enabled
     if( !mainconfig.plugins[commandObj.plugin] )

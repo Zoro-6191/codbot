@@ -9,6 +9,8 @@ const rcon = require('../rcon')
 const ErrorHandler = require('../errorhandler')
 const eventhandler = require('../eventhandler')
 
+var pluginConf
+
 module.exports = 
 {
     init,
@@ -20,7 +22,17 @@ module.exports =
 
     cmd_aliases: async function( slot, mode, cmd, cmdargs )
     {
+        // for now we'll just get aliases everytime from db
+        // unless player is masked
 
+        if( cmdargs.length < 1 )
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams)
+    },
+
+    cmd_codbot: async function( slot, mode, cmd, cmdargs )
+    {
+        sendMsg( mode, slot, '^1[^3CODBOT^1]')
+        sendMsg( mode, slot, '^2By Zoro')
     },
 
     cmd_iamgod: async function( slot, mode, cmd, cmdargs )
@@ -38,8 +50,10 @@ module.exports =
 
 async function init()
 {
-    player.on( 'connect', onConnect( guid, slot, ign) )
-    player.on( 'disconnect', onDisconnect( guid, slot, ign) )
+    pluginConf = conf.plugin.admin
+
+    // player.on( 'connect', onConnect( guid, slot, ign) )
+    // player.on( 'disconnect', onDisconnect( guid, slot, ign) )
 }
 
 async function onConnect( guid, slot, ign )

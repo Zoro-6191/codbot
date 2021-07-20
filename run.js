@@ -8,6 +8,7 @@ const cmdHandler = require('./commandhandler')
 const client = require('./client.js')
 const groups = require("./groups.js")
 const msnger = require('./msnger')
+const plugins = require('./plugins')
 // TO-DO: CLI args?
 
 // =================================================
@@ -33,6 +34,7 @@ eventhandler.bot.once( 'database_ready', ()=>
         msnger.init()   // chat rcon messenger
         logread.initLogRead()  // begin reading logfile
         cmdHandler.init()   // process all incoming commands
+        plugins.init()
     })
 
 // console.log( eventhandler )
