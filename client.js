@@ -13,35 +13,43 @@ module.exports =
     updateClientInfo
 }
 
+// TO-DO: aliascount, assists, deaths, ipaliascount, kills, ratio, roundsplayed, skill, suicides, teamdeaths, tk
+
 // ======= client object:
 // [
 //  // each player has one of these
 //     {
+//         aliascount:
 //         assists:
 //         deaths:
 //         id:
 //         ip:
+//         ipaliascount:
 //         kills:
 //         greeting:
 //         group_level:
 //         guid:
 //         last_ip:
 //         last_name:
+//         losestreak:
 //         name:
 //         noc:
 //         masked_level:
 //         ping:
 //         ratio:
 //         registered:
+//         roundsplayed:
 //         score:
 //         skill:
-//         slot: - primary key
+//         slot:
 //         steamid:
 //         suicides:
 //         teamdeaths:
 //         time_add:
 //         time_edit:
 //         tk:
+//         winstreak:
+//         xlrhide:
 //     },
 // ]
 
@@ -106,7 +114,7 @@ async function onConnect( guid, slot, ign )
         updateClientInfo( slot, "ip", onlinePlayers[i].ip )
     }
     
-    var clientObj = client.find( cl => cl.slot == slot )
+    var clientObj = await getClientObj( slot )
     // now fetching info from query
     // aliascount, penaltiescount, ipaliascount
     // kills, deaths, assists, tk, teamdeaths, suicides, roundsplayed, ratio, skill, winstreak, losestreak, xlrhide from xlr_playerstats
@@ -130,7 +138,9 @@ async function onConnect( guid, slot, ign )
             updateClientInfo( slot, "teamdeaths", result[0].teamdeaths )
             updateClientInfo( slot, "suicides", result[0].suicides )
             updateClientInfo( slot, "ratio", result[0].ratio )
+            updateClientInfo( slot, "roundsplayed", result[0].rounds )
             updateClientInfo( slot, "skill", result[0].skill )
+            updateClientInfo( slot, "xlrhide", result[0].hide )
         }
         else    // player not registered
         {
@@ -142,7 +152,9 @@ async function onConnect( guid, slot, ign )
             updateClientInfo( slot, "teamdeaths", 0 )
             updateClientInfo( slot, "suicides", 0 )
             updateClientInfo( slot, "ratio", 1.0 )
+            updateClientInfo( slot, "roundsplayed", 0 )
             updateClientInfo( slot, "skill", 1000.0 )
+            updateClientInfo( slot, "xlrhide", 0 )
         }
         console.log(client)
     })
@@ -154,6 +166,7 @@ async function getClientObj( slot )
     if( client == undefined )
         return undefined
     
+    // TO-DO: improve from .find()?
     var clientObj = client.find( client => client.slot == slot )
     
     if( clientObj == undefined )
@@ -168,7 +181,7 @@ async function getClientInfo( slot, property )
     if( client == undefined )
         return undefined
 
-    var clientObj = client.find( client => client.slot == slot )
+    var clientObj = await getClientObj( slot )
         
     if( clientObj == undefined )
         return undefined
@@ -182,7 +195,7 @@ async function updateClientInfo( slot, property, value )
     if( client == undefined )
         client = []
 
-    var clientObj = client.find( client => client.slot == slot )
+    var clientObj = await getClientObj( slot )
 
     // create new entry if empty
     if( clientObj == undefined )

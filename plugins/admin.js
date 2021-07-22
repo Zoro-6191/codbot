@@ -50,7 +50,7 @@ module.exports =
         }
         token = cmdargs[0].toLowerCase()
 
-        var name = clientModule.client.find( zz => zz.slot == slot ).name
+        var name = clientModule.getClientInfo( slot, 'name' )
 
         switch(token)
         {
@@ -91,7 +91,7 @@ module.exports =
             return sendMsg( 'p', slot, "Incorrect Password" )
         
         // now to get client and updating group in db and clientobj
-        clientObj = clientModule.client.find( zz => zz.slot == slot )
+        clientObj = await clientModule.getClientObj( slot )
 
         if( clientObj.group_level == highestLevel )
             return sendMsg( 'p', slot, `You're already ${ await groupOperations.LevelToName( highestLevel )}` )
@@ -101,14 +101,15 @@ module.exports =
         highestBits = await groupOperations.LevelToBits( highestLevel )
 
         // update in database
-        db.pool.query( `UPDATE clients SET group_bits=${highestBits},time_edit=UNIX_TIMESTAMP() WHERE id=${parseInt(clientObj.id)}`, (err)=>{
-            if( err )
+        var q = db.pool.query( `UPDATE clients SET group_bits=${highestBits},time_edit=UNIX_TIMESTAMP() 
+        WHERE id=${parseInt(clientObj.id)}`).catch( (err)=>
             {
                 console.log(err)
                 ErrorHandler.warning(`Couldn't save updated group level of player ${clientObj.name} @${clientObj.id} to database`)
-            }
-            else return sendMsg( 'p', slot, `You're now ${groupOperations.LevelToName( highestLevel ) }` )
-        })
+            })
+
+        if( q != undefined )
+            return sendMsg( 'p', slot, `You're now ${groupOperations.LevelToName( highestLevel ) }` )
     },
 
     // leveltest: admin level of player and since when
@@ -117,36 +118,26 @@ module.exports =
         var name, id, level, groupname, timeadd
         var msg = pluginConf.messages.cmd_leveltest
         var tz = mainconfig.codbot.timezone
+
         // if not args, display cmders level
         if( cmdargs.length )
         {
             var arg = cmdargs[0]
             // get player from args and validate it
             if( !Number.isNaN( parseInt(arg) ) && parseInt(arg) <=64 )
-                clientObj = clientModule.client.find( zz => zz.slot == arg )
+                clientObj = await clientModule.getClientObj( arg )
 
             if( clientObj == undefined )
                 return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
 
-            console.log( clientObj )
-
-            name = clientObj.name
-            id = clientObj.id
-            level = clientObj.group_level
-            groupname = groupOperations.LevelToName( level )
-            timeadd = clientObj.time_add
         }
-        else
-        {
-            clientObj = clientModule.client.find( zz => zz.slot == slot )
+        else clientObj = await clientModule.getClientObj( slot )
 
-            name = clientObj.name
-            id = clientObj.id
-            level = clientObj.group_level
-            groupname = groupOperations.LevelToName( level )
-            timeadd = clientObj.time_add
-        }
-        console.log( clientObj )
+        name = clientObj.name
+        id = clientObj.id
+        level = clientObj.group_level
+        groupname = groupOperations.LevelToName( level )
+        timeadd = clientObj.time_add
 
         // now to format unix timestamp properly
         timeadd = new Date(timeadd * 1000).toLocaleString("en-US", { dateStyle: 'full', timeZone: tz } );
@@ -166,6 +157,56 @@ module.exports =
         // get maps object
         // then display
         // ez
+    },
+
+    // register: promote guests to user, and enable their xlrstats
+    cmd_register: async function( slot )
+    {
+        // return if player already higher group
+        const { lowestLevel } = require('../groups')
+
+        var clientObj = await clientModule.getClientObj( slot )
+        
+        // no players exist?
+        if( clientObj == undefined )
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd )
+
+        if( clientObj.group_level > lowestLevel )
+            sendMsg( 'p', slot, `You are already in a higher group level` )
+
+        // this way they get to keep the stats they earned this session
+        // IGNORE = ignore errors, thus only creating row if it doesnt already exist based on client_id
+        db.pool.query(`INSERT IGNORE INTO xlr_playerstats 
+        SET client_id=${clientObj.id}, kills=${clientObj.kills}, deaths=${clientObj.deaths}
+        teamkills=${clientObj.tk}, teamdeaths=${clientObj.teamdeaths}, suicides=${clientObj.suicides},
+        ratio=${clientObj.ratio}, skill=${clientObj.skill}, rounds=${clientObj.roundsplayed}`)
+        .catch( (err)=> ErrorHandler.minor(err) )
+        .then( ()=> db.pool.query(`UPDATE clients SET group_bits=1 WHERE id=${clientObj.id}`) )
+        .catch( (err)=>
+            {
+                ErrorHandler.warning(err)
+                return sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd )
+            })
+        .then( (result)=> 
+            {
+                var confirmMsg = pluginConf.messages.regme_confirmation
+                confirmMsg = replacePlaceholder( confirmMsg, '%player%', clientObj.name )
+                console.log(confirmMsg)
+                confirmMsg = replacePlaceholder( confirmMsg, '%groupname%', groupOperations.BitsToName(1) )
+
+                clientObj.group_level = 1
+
+                sendMsg( 'p', slot, confirmMsg )
+                if( pluginConf.settings.announce_registration )
+                {
+                    var announceMsg = pluginConf.messages.regme_announce
+                    announceMsg = replacePlaceholder( announceMsg, '%player%', clientObj.name )
+                    announceMsg = replacePlaceholder( announceMsg, '%groupname%', groupOperations.BitsToName(1) )
+
+                    return sendMsg( 'g', slot, announceMsg )
+                }
+            }
+        )
     }
 }
 

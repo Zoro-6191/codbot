@@ -1,4 +1,4 @@
-// this file initiates our bot
+// this module initiates our bot
 const logread = require("./logread.js")
 const db = require('./db.js')
 const config = require('./conf')
@@ -9,7 +9,7 @@ const client = require('./client.js')
 const groups = require("./groups.js")
 const msnger = require('./msnger')
 const plugins = require('./plugins')
-// TO-DO: CLI args?
+// TO-DO: CLI?
 
 // =================================================
 // create read stream - done
@@ -36,22 +36,5 @@ eventhandler.bot.once( 'database_ready', ()=>
         cmdHandler.init()   // process all incoming commands
         plugins.init()
     })
-
-// console.log( eventhandler )
-
-var uptime = 1000000
-
-var seconds = Math.floor(uptime/1000)
-var minutes = Math.floor(seconds/60)
-var hours = Math.floor(minutes/60)
-var days = Math.floor(hours/24)
-
-hours = days?hours%24:hours
-minutes = days?0:(hours?minutes%60:minutes)
-seconds = days?0:(hours?0:(minutes?seconds%60:seconds))
-
-uptime = `${days?(days==1?days+' Day ':days+' Days '):''}${hours?(hours==1?hours+' Hour ':hours+' Hours '):''}${minutes?(minutes==1?minutes+' min ':minutes+' mins '):''}${seconds?(seconds==1?seconds+' sec ':seconds+' secs '):''}`
-
-console.log(uptime)
 
 eventhandler.bot.emit('ready')

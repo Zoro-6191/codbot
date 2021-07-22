@@ -103,9 +103,9 @@ async function initPlayerDisconnect( guid, slot, ign )
 
     // db.pool.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
 
-    // console.log(client)
+    console.log(client)
     client.splice( client.indexOf( client.find( clients => clients.slot==slot ) ), 1 )  // should be enough
-    // console.log(client)
+    console.log(client)
 
     console.log(`${ign} disconnected. Slot: ${slot}`);
 

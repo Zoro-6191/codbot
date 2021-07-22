@@ -271,7 +271,7 @@
         "players_matched": "^7Players matching %s %s",
         "ban_self": "^7%s ^7Can't ban yourself",
         "regme_confirmation": "^7Thanks for your registration. You are now in group ^7%groupname%",
-        "regme_annouce": "^3%player% ^7put in group ^2%groupname%",
+        "regme_announce": "^3%player% ^7registered",
         "groups_added": "^1%player% ^7added to group ^2%groupname%",
         "groups_put": "^7%player% ^7put in group %groupname%",
         "groups_none": "^7%player% ^7is not in any groups",

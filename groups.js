@@ -1,4 +1,5 @@
 // this module takes care of admin groups
+const fs = require('fs')
 const db = require('./db')
 const ErrorHandler = require('./errorhandler')
 
@@ -33,14 +34,14 @@ module.exports.groupOperations =
     KeywordToName,
     LevelToBits,
     LevelToKeyword,
-    LevelToName,
-    updateClientGroup
+    LevelToName
 }
 
 async function createGlobalGroups( queryResult )
 {
     globalGroups = []
     highestLevel = 0
+    lowestLevel = 100   // enough?
     
     Object.keys( queryResult ).forEach( key => 
     {
@@ -55,9 +56,14 @@ async function createGlobalGroups( queryResult )
         // update highest Level
         if( queryResult[key].level > highestLevel )
             highestLevel = queryResult[key].level
+
+        // update lowest Level
+        if( queryResult[key].level < lowestLevel )
+            lowestLevel = queryResult[key].level
     })
     module.exports.globalGroups = globalGroups
     module.exports.highestLevel = highestLevel
+    module.exports.lowestLevel = lowestLevel
 }
 
 function BitsToLevel( bits )
@@ -165,7 +171,7 @@ async function insertDefaultGroups()
     // read individual line and query it while reading
     rl.on( 'line', (line)=>
         {
-            module.exports.query( line, (err,result)=>{
+            db.pool.query( line, (err,result)=>{
                 if(err)
                     ErrorHandler.fatal(err)
             })
@@ -173,7 +179,7 @@ async function insertDefaultGroups()
 
     // notify to console
 	rl.on( 'close', ()=> {
-		console.log(`Initiated Default Groups:\n	100 - Super Admin\n	80 - Senior Admin\n	60 - Full Admin\n	40 - Admin\n	20 - Moderator\n	2 - Regular\n	1 - Usern	0 - Guest`)
+		console.log(`Initiated Default Groups:\n	100 - Super Admin\n	80 - Senior Admin\n	60 - Full Admin\n	40 - Admin\n	20 - Moderator\n	2 - Regular\n	1 - User\n	0 - Guest`)
         // now to forward to creating global group object
         // createGlobalGroups()
         // just querying again is probably best
@@ -183,9 +189,4 @@ async function insertDefaultGroups()
             else createGlobalGroups( result )
         })
 	})
-}
-
-async function updateClientGroup( slot, group )
-{
-
 }

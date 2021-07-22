@@ -1,6 +1,6 @@
 // this module takes care of mysql database and its connectivity to rest of the project
 const fs = require('fs')
-const mysql = require('mysql')
+const mysql = require('promise-mysql')
 const { exit } = require('process')
 const ErrorHandler = require('./errorhandler')
 
@@ -24,93 +24,72 @@ module.exports =
 
 		// now check if user has entered workable entries in config, has to be in sync
 		await checkConfigEntries( mysqldb )
+
+		// no database async connection
+		this.pool = await mysql.createPool(
+			{
+				host: mysqldb.host,
+				port: mysqldb.port,
+				user: mysqldb.user,
+				password: mysqldb.password
+			})
 		
 		// synchronous connection
-		this.connection = mysql.createConnection(
+		this.connection = await mysql.createConnection(
 			{
 				host: mysqldb.host,
 				port: mysqldb.port,
 				user: mysqldb.user,
 				password: mysqldb.password,
 				database: mysqldb.database
-			});
-
-		// async connection
-		// parallel queries can be executed
-		this.pool = mysql.createPool(
-			{
-				host: mysqldb.host,
-				port: mysqldb.port,
-				user: mysqldb.user,
-				password: mysqldb.password
-			});
-
-		this.query = this.pool.query
-		this.keepAlive();
-
-		// now to check if host/user/pass are correct and database exists and we have access to it:
-		// this.connection.query(`SELECT *  FROM information_schema WHERE TABLE_NAME = "my_table"`)
-		this.connection.query(`SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${mysqldb.database}'`, ( err, result )=>
-		{
-			if( err != undefined && err.code == 'ECONNREFUSED' )
-				ErrorHandler.fatal( `MySQL Server refused connection.\nThis means either the MySQL server is down or has blocked this IP Address.` )
-
-			if( err != undefined && err.code == 'ER_ACCESS_DENIED_ERROR' )
-				ErrorHandler.fatal( `MySQL ERROR:\n${err.sqlMessage}` )
-
-			if( err != undefined && err.code == 'ER_BAD_DB_ERROR' )	// database doesn't exist
-			{
-				// maybe give user option to create a database right now
-				const rl = require("readline").createInterface({ input: process.stdin, output: process.stdout })
-				rl.question(`Database "${mysqldb.database}" doesn't exist. Create one right now? (y/n)\n-> `, (input)=>
+			}).then( ()=> DBExistsGoAhead() )
+			.catch( async (err) => 
 				{
-					input = input.toLowerCase()
-					if(input!='y'&&input!='n'){ ErrorHandler.minor(`Invalid input: ${input}. Quitting..`);exit(1); }	// anything other than y/n
-					
-					if( input == 'y' )
+					if( err.code == 'ECONNREFUSED' )
+						ErrorHandler.fatal( `MySQL Server refused connection.\nThis means either the MySQL server is down or has blocked this IP Address.` )
+
+					if( err.code == 'ER_ACCESS_DENIED_ERROR' )
+						ErrorHandler.fatal( `MySQL ERROR:\n${err.sqlMessage}` )
+
+					if( err.code == 'ER_BAD_DB_ERROR' )	// database doesn't exist
 					{
-						console.log(`Creating Database "${mysqldb.database}"`)
-
-						var sql = `CREATE DATABASE ${mysqldb.database};`
-						
-						this.pool.query( sql, (err,result)=> 
+						// maybe give user option to create a database right now
+						const rl = require("readline").createInterface({ input: process.stdin, output: process.stdout })
+						rl.question(`Database "${mysqldb.database}" doesn't exist. Create one right now? (y/n)\n-> `, async (input)=>
+						{
+							input = input.toLowerCase()
+							if(input!='y'&&input!='n'){ ErrorHandler.minor(`Invalid input: ${input}. Quitting..`);exit(1); }	// anything other than y/n
+							
+							if( input != 'y' )
 							{
-								if( err || result == undefined)
-									ErrorHandler.fatal(`Error while creating database\n${err?err:'Query returned empty object'}`)
-								
-								console.log(`Successful`)
+								ErrorHandler.minor(`Can't continue without a database. Quitting...`);
+								exit(1);
+							}
+							console.log(`Creating Database "${mysqldb.database}"`)
 
-								// re-establish connection
-								this.connection = mysql.createConnection(
-									{
-										host: mysqldb.host,
-										port: mysqldb.port,
-										user: mysqldb.user,
-										password: mysqldb.password,
-										database: mysqldb.database
-									});
-
-								// TO-DO: maybe setup basic tables here n now
-								// aliases, clients, current_clients, current_svars, groups, ipaliases, penalties, xlr?
-								DBExistsGoAhead()
-							})
+							this.pool.query( `CREATE DATABASE ${mysqldb.database};` ).then(async ()=>
+								{
+									// re-establish connection
+									module.exports.connection = await mysql.createConnection(
+										{
+											host: mysqldb.host,
+											port: mysqldb.port,
+											user: mysqldb.user,
+											password: mysqldb.password,
+											database: mysqldb.database
+										}).catch( err => ErrorHandler.fatal(`Error in re-establishing connection to MySQL Server after creating DB\n${err}`) )
+								})
+								.then( ()=> DBExistsGoAhead() )
+								.catch( err => ErrorHandler.fatal(`Error while creating database\n${err}`) )
+						})
 					}
-					else { ErrorHandler.minor(`Can't continue without a database. Quitting...`);exit(1); }
 				})
-			}
-			
-			if( result != undefined && result[0] != undefined )	// database already exists		// [ RowDataPacket { SCHEMA_NAME: 'codbot' } ]
-			{
-				DBExistsGoAhead()
-			}
-		})
+		
+		this.keepAlive();
 	},
 	keepAlive: async function()
     {
-		setInterval( ()=>
-        {
-			this.pool.query('SELECT 1');
-		}, 100000 );	// every 100seconds, should be fine
+		setInterval( ()=> module.exports.pool.query('SELECT 1') , 100000 );	// every 100seconds, should be fine
 	},
 	info: function(){ return this.pool }
 }
@@ -133,7 +112,7 @@ function checkConfigEntries( mysqldb )
 	});
 }
 
-function DBExistsGoAhead()
+async function DBExistsGoAhead()
 {
 	const { bot } = require('./eventhandler')
 
@@ -141,14 +120,14 @@ function DBExistsGoAhead()
 	var missingTables = []
 
 	// update database in pool
-	module.exports.pool = mysql.createConnection(
+	module.exports.pool = await mysql.createConnection(
 		{
 			host: mysqldb.host,
 			port: mysqldb.port,
 			user: mysqldb.user,
 			password: mysqldb.password,
 			database: mysqldb.database
-		});
+		}).catch(err=>ErrorHandler.fatal(err)/* can it even get here */)
 
 	// now to check what tables exists and what not
 	module.exports.pool.query( `SHOW TABLES;`, async (err, result)=> {
@@ -187,6 +166,8 @@ function DBExistsGoAhead()
 
 async function CreateMissingTables( missingTables )
 {
+	const { bot } = require('./eventhandler')
+	
 	console.log(`Missing Tables:`)
 	console.log(missingTables)
 
@@ -198,7 +179,7 @@ async function CreateMissingTables( missingTables )
 		const table = missingTables[i]
 		var template = fs.readFileSync(`./sql/templates/${table}.sql`,'utf-8')
 
-		module.exports.query( template, async (err, result)=>{
+		module.exports.pool.query( template, async (err)=>{
 			if(err)
 				ErrorHandler.fatal(err)
 			else console.log(`Created Table: "${table}"`)
