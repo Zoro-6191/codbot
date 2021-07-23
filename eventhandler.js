@@ -94,18 +94,12 @@ async function initPlayerDisconnect( guid, slot, ign )
 {
     const { client } = require('./client')
     player = module.exports.player
-    // here we firstly change time_edit in clients table 
-    // then remove disconnected player from global client object
+    // remove disconnected player from global client object
     // then emitting 'disconnect'
 
-    // time format in b3 is in 10 digits, which can only be UTC in seconds.
-    // rightnow = Math.floor(Date.now()/1000)
-
-    // db.pool.query(`UPDATE clients SET time_edit=${rightnow} WHERE guid=${guid}`, (err)=>{ ErrorHandler.minor( `Error while writing info about client to Database in Disconnect Event:\n${err}` ) })
-
-    console.log(client)
+    // console.log(client)
     client.splice( client.indexOf( client.find( clients => clients.slot==slot ) ), 1 )  // should be enough
-    console.log(client)
+    // console.log(client)
 
     console.log(`${ign} disconnected. Slot: ${slot}`);
 

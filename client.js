@@ -181,7 +181,7 @@ async function getClientInfo( slot, property )
     if( client == undefined )
         return undefined
 
-    var clientObj = await getClientObj( slot )
+    var clientObj = client.find( client => client.slot == slot )
         
     if( clientObj == undefined )
         return undefined
@@ -195,7 +195,7 @@ async function updateClientInfo( slot, property, value )
     if( client == undefined )
         client = []
 
-    var clientObj = await getClientObj( slot )
+    var clientObj = client.find( client => client.slot == slot )
 
     // create new entry if empty
     if( clientObj == undefined )

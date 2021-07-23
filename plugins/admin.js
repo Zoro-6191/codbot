@@ -31,7 +31,7 @@ module.exports =
         // unless player is masked
 
         if( !cmdargs.length )
-            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams)
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
     },
 
     // codbot: equivalent command to !b3.
