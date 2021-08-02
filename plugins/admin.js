@@ -12,6 +12,7 @@ const ErrorHandler = require('../errorhandler')
 const eventhandler = require('../eventhandler')
 const { msToTime } = require('../utility')
 
+// vars for local use
 var mainconfig, pluginConf
 
 module.exports = 
@@ -21,7 +22,34 @@ module.exports =
     // admins: get a list of online admins
     cmd_admins: async function( slot, mode, cmdargs )
     {
+        // get config least admin level
+        var least = pluginConf.settings.admins_level
+        var client = clientModule.client
+        var adminCount = 0
+        var adminStr = ""
 
+
+        // now to get list of all online admins
+        Object.keys(client).forEach( cl => {
+            if( cl.group_level >= least )
+            {
+                // create count
+                adminCount++
+
+                // create string to be sent
+                if( adminStr != "" )
+                    adminStr += ", "
+
+                adminStr += `${cl.name}^7 [^3${cl.group_level}^7]`
+            }
+        })
+
+        if( !adminCount )
+            return sendMsg( mode, slot, pluginConf.messages.noadmin )
+
+        var sendStr = pluginConf.messages.cmd_admins.replace( '%admins%', adminStr )
+
+        return sendMsg( mode, slot, sendStr )
     },
 
     // aliases: command to check player's aliases used in the server
@@ -158,6 +186,29 @@ module.exports =
         // then display
         // ez
     },
+    
+    // poke: fun cmd
+    cmd_poke: async function( slot, mode, cmdargs )
+    {
+        if( !cmdargs.length )
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
+        else
+        {
+            var arg = cmdargs[0]
+            // get player from args and validate it
+            if( !Number.isNaN( parseInt(arg) ) && parseInt(arg) <= 64 )
+                clientObj = await clientModule.getClientObj( arg )
+
+            if( clientObj == undefined )
+                return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
+        }
+
+        let options = [ 'Wake up', '*poke*', 'Attention', 'Get up', 'Go', 'Move out' ]
+
+        let i = Math.floor(Math.random() * options.length)
+
+        return sendMsg('g', slot, `${options[i]} %player%!`.replace( '%player%', playername ) )
+    },
 
     // register: promote guests to user, and enable their xlrstats
     cmd_register: async function( slot )
@@ -174,7 +225,7 @@ module.exports =
         if( clientObj.group_level > lowestLevel )
             sendMsg( 'p', slot, `You are already in a higher group level` )
 
-        // this way they get to keep the stats they earned this session
+        // this way they get to keep the stats they earned this session, another improvement on b3
         // IGNORE = ignore errors, thus only creating row if it doesnt already exist based on client_id
         db.pool.query(`INSERT IGNORE INTO xlr_playerstats 
         SET client_id=${clientObj.id}, kills=${clientObj.kills}, deaths=${clientObj.deaths}

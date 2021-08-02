@@ -218,5 +218,7 @@ async function playerSearchFromName( mode, slot, nameStr )
     // slot = slot of guy typing the command
     // nameStr = name guy typed
 
-    // Object.keys( client ).forEach
+    nameStr = nameStr.toLowerCase()
+
+    result = client.find( cl => cl.name.toLowerCase().includes(nameStr) )
 }

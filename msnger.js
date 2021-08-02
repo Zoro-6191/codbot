@@ -49,6 +49,8 @@ async function sendMsg( mode, slot, msg )
         rcon.rcontool.tell( slot, msg )
     else if( mode == 'g')
         rcon.rcontool.say( msg )
+
+    // max string length in chat?
 }
 
 async function replacePlaceholder( string, holder, value )

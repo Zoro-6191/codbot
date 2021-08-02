@@ -8,7 +8,7 @@
         //      seta sv_consayname ""
         //      seta sv_contellname ""
         // Alternatively, you can set "botprefix" setting to empty and use those above commands. Or you could use both
-        "botprefix": "^1[^3CODBOT^1]^7:",
+        "chatprefix": "^1[^3CODBOT^1]^7:",
 
         // bot timezone
         "timezone": "IST",
