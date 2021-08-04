@@ -28,7 +28,6 @@ module.exports =
         var adminCount = 0
         var adminStr = ""
 
-
         // now to get list of all online admins
         Object.keys(client).forEach( cl => {
             if( cl.group_level >= least )
@@ -60,6 +59,26 @@ module.exports =
 
         if( !cmdargs.length )
             return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
+
+        // get player from args and validate it
+        var arg = cmdargs[0]
+        if( !Number.isNaN( parseInt(arg) ) && parseInt(arg) <= 64 )
+            clientObj = await clientModule.getClientObj( arg )
+
+        if( clientObj == undefined )
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
+
+        if( clientObj.mask_level )
+            return sendMsg( mode, slot, pluginConf.messages.cmd_noaliases )
+
+        // now fetch aliases from aliases table
+        const res = await db.pool.query( `SELECT * FROM aliases WHERE client_id=${clientObj.id}` )
+
+        // query returned empty obj
+        if( res == {} )
+            return sendMsg( mode, slot, pluginConf.messages.cmd_noaliases )
+
+        // TO-DO: do rest later xd
     },
 
     // codbot: equivalent command to !b3.
@@ -186,6 +205,17 @@ module.exports =
         // then display
         // ez
     },
+
+    // mask: mask people's admin level and aliases
+    cmd_mask: async function( slot, mode, cmdargs )
+    {
+        // check if args are correct
+        if( !cmdargs.length )
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
+
+        // get player from second arg if exists
+        
+    },
     
     // poke: fun cmd
     cmd_poke: async function( slot, mode, cmdargs )
@@ -258,6 +288,38 @@ module.exports =
                 }
             }
         )
+    },
+
+    // unmask
+    cmd_unmask: async function( slot, mode, cmdargs )
+    {
+        // unless arg exists unmask yourself
+        if( !cmdargs.length )
+            var clientObj = await clientModule.getClientObj( slot )
+        else
+        {
+            // here check for cmdargs, validate them and get player from them
+            
+        }
+
+        // check if they're already unmasked
+        if( !clientObj.mask_level )
+        {
+            if( clientObj.slot == slot )    // cmder
+                var msg1 = `You're already unmasked.`
+            else var msg1 = `^1${clientObj.name} ^7is already unmasked.`
+            return sendMsg( mode, slot, msg1 )
+        }
+        
+        // unmask them and update it in db
+        try
+        {
+            db.pool.query( `` )
+        }
+        catch( err )
+        {
+            
+        }
     }
 }
 
