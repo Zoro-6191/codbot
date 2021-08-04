@@ -198,6 +198,19 @@ module.exports =
         return sendMsg( mode, slot, msg )
     },
 
+    // map: change map
+    cmd_map: async function( slot, mode, cmdargs )
+    {
+        var clientObj = await clientModule.getClientObj( slot )
+        
+        // check if map exists in maplist
+        
+
+        // if enabled, notify everyone who issued the command
+        if( pluginConf.settings.notify_issuer )
+            sendMsg( 'g', slot, `^5${clientObj.name} has issued the command to change map to ${mapName}` )
+    },
+
     // maps: display list of all maps from "codbot/conf/maps.txt"
     cmd_maps: async function( slot, mode, cmdargs )
     {
@@ -241,7 +254,7 @@ module.exports =
     },
 
     // register: promote guests to user, and enable their xlrstats
-    cmd_register: async function( slot )
+    cmd_register: async function( slot, mode )
     {
         // return if player already higher group
         const { lowestLevel } = require('../groups')
@@ -253,7 +266,7 @@ module.exports =
             return sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd )
 
         if( clientObj.group_level > lowestLevel )
-            sendMsg( 'p', slot, `You are already in a higher group level` )
+            sendMsg( mode, slot, `You are already in a higher group level` )
 
         // this way they get to keep the stats they earned this session, another improvement on b3
         // IGNORE = ignore errors, thus only creating row if it doesnt already exist based on client_id
@@ -277,7 +290,7 @@ module.exports =
 
                 clientObj.group_level = 1
 
-                sendMsg( 'p', slot, confirmMsg )
+                sendMsg( mode, slot, confirmMsg )
                 if( pluginConf.settings.announce_registration )
                 {
                     var announceMsg = pluginConf.messages.regme_announce

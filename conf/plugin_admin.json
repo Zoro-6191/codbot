@@ -23,6 +23,7 @@
         "ban_duration": "15d",  // tempban duration to apply to the !ban and !banall commands
         "announce_registration": true,  // show a message to all users when a user registered himself. Encourages other Users to register too. - use true or false
         "past_bans_check_rate:": 10,  // show a message to all users when a user registered himself. Encourages other Users to register too. - use true or false
+        "notify_issuer": true,  // notify in chat who issued the command in commands: !map, !gametype, !mag
         "warn": {
             "pm_global": false,     // determines whether the warning is sent to the the whole server (true), or just the player and admin (false), to reduce chatbox spam.
             "alert_kick_num": 3,    // if a player reach this number of active warnings he will be notified by with message then tempbanned

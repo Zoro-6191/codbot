@@ -168,6 +168,8 @@ async function insertDefaultGroups()
 {
 	var rl = require('readline').createInterface( {input: fs.createReadStream('./sql/templates/defaultgroups.sql'), output: process.stdout, terminal: false } );
 	
+    rl.on( 'error', err => ErrorHandler.fatal(err) )
+
     // read individual line and query it while reading
     rl.on( 'line', (line)=>
         {
