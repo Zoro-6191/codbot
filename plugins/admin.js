@@ -305,7 +305,7 @@ module.exports =
         // check if they're already unmasked
         if( !clientObj.mask_level )
         {
-            if( clientObj.slot == slot )    // cmder
+            if( cmdargs.length )    // cmder
                 var msg1 = `You're already unmasked.`
             else var msg1 = `^1${clientObj.name} ^7is already unmasked.`
             return sendMsg( mode, slot, msg1 )
@@ -314,11 +314,14 @@ module.exports =
         // unmask them and update it in db
         try
         {
-            db.pool.query( `` )
+            db.pool.query( `UPDATE clients SET mask_level=0 WHERE id=${clientObj.id}` );
+            clientObj.mask_level = 0;
+            return sendMsg( mode, slot, `Unmasked ^2${cmdargs.length?clientObj.name='^7 ':''}` )
         }
         catch( err )
         {
-            
+            ErrorHandler.minor(err)
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd )
         }
     }
 }
