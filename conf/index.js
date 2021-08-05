@@ -6,7 +6,8 @@ const ErrorHandler = require('../src/errorhandler')
 
 module.exports = 
 {
-    initConf
+    initConf,
+    DebugMode: false
 }
 
 function initConf()
@@ -26,6 +27,19 @@ function initConf()
     catch(e)
     {
         ErrorHandler.fatal(`Incorrect JSON Syntax found in file: /conf/codbot.json\n${e}`)
+    }
+
+    // check debug mode
+    var debugvar = this.mainconfig.codbot.debug
+    if( typeof debugvar == 'boolean' && debugvar )
+    {
+        this.DebugMode = true
+        console.log(`Debug Mode: On`)
+    }    
+    else
+    {
+        ErrorHandler.warning(`Debug mode only accepts boolean(true/false) as it's variable, and without quotes.\nDisabling Debug Mode.`)
+        console.log(`Debug Mode: Off`)
     }
 
     // check if timezone is mentioned correctly
