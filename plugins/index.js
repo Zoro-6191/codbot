@@ -1,3 +1,4 @@
+const { DebugMode } = require.main.require('./conf')
 const ErrorHandler = require.main.require('./src/errorhandler')
 const conf = require.main.require('./conf')
 

@@ -1,4 +1,5 @@
 // this module manages all the events and provides accessibility to plugins
+const { DebugMode } = require.main.require('./conf')
 const ErrorHandler = require('./errorhandler')
 const { groupOperations } = require('../utils/groups')
 
@@ -17,7 +18,8 @@ function initEventHandler()
     module.exports.server = new events.EventEmitter()
     module.exports.bot = new events.EventEmitter()
 
-    console.log("Initialized: Event Handler")
+    if( DebugMode )
+        console.log("Initialized: Event Handler")
 }
 
 async function initPlayerConnect( guid, slot, ign )

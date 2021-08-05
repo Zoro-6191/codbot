@@ -1,5 +1,6 @@
 // commands: xlrstats, xlrhide, xlrtopstats
 
+const { DebugMode } = require.main.require('./conf')
 const db = require.main.require('./utils/db')
 const ErrorHandler = require.main.require('./src/errorhandler')
 

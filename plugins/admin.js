@@ -2,6 +2,7 @@
 // makereg, unreg, putgroup, ungroup, say, time, seen, lookup, scream, find, clientinfo, kick, kickall, spank, spankall, permban, ban, banall, lastbans, baninfo, unban,
 // runas, aliases, warns, notice, warn, warntest, warnremove, warnclear, warninfo, maps, nextmap, spam, rules, spams, tempban, poke
 
+const { DebugMode } = require.main.require('./conf')
 const db = require.main.require('./utils/db')
 const { sendMsg, replacePlaceholder } = require.main.require('./utils/msnger')
 const conf = require.main.require('./conf')
