@@ -4,7 +4,7 @@
 module.exports.initRcon = async function()
 {
     const { createRconCommands } = require( '@arbytez/cod4-rcon-commands' )
-	const server = require('./conf').mainconfig.server
+	const server = require('../conf').mainconfig.server
 
     // TO-DO: check authenticity of config entries
 
