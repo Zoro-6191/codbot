@@ -14,7 +14,7 @@ async function initLogRead()
     const parser = require('./parser.js')
     const { extname } = require('path')
 
-    logpath = require('./conf').mainconfig.server.logfile
+    logpath = require('../conf').mainconfig.server.logfile
 
     // check if mentioned logfile exists
     if (!fs.existsSync(logpath)) 

@@ -2,7 +2,7 @@
 const cjson = require('comment-json')
 const fs = require('fs')
 const { extname } = require('path')
-const ErrorHandler = require('../errorhandler')
+const ErrorHandler = require('../src/errorhandler')
 
 module.exports = 
 {
@@ -11,7 +11,7 @@ module.exports =
 
 function initConf()
 {
-    const { bot } = require('../eventhandler')
+    const { bot } = require('../src/eventhandler')
     const mainConfPath = './conf/codbot.json'
 
     if( !fs.existsSync(mainConfPath) )

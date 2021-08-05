@@ -1,6 +1,6 @@
 // this module takes care of sending messages to server/player
 const rcon = require('./rcon.js')
-const conf = require('./conf')
+const conf = require('../conf')
 
 module.exports = 
 {

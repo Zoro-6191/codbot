@@ -1,4 +1,4 @@
-const ErrorHandler = require('../errorhandler')
+const ErrorHandler = require('../src/errorhandler')
 const conf = require('../conf')
 
 module.exports.init = async function()

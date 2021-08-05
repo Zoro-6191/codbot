@@ -1,7 +1,7 @@
 // this module takes care of admin groups
 const fs = require('fs')
 const db = require('./db')
-const ErrorHandler = require('./errorhandler')
+const ErrorHandler = require('../src/errorhandler')
 
 // for local use
 var globalGroups, highestLevel

@@ -1,5 +1,5 @@
 const ErrorHandler = require('./errorhandler')
-const { sendMsg } = require('./msnger')
+const { sendMsg } = require('../utils/msnger')
 
 var prefix, prefix_loud
 
@@ -12,7 +12,7 @@ async function init()
 {
     const { player } = require('./eventhandler')
     const { rcontool } = require('./rcon')
-    const { mainconfig, plugin, command } = require('./conf')
+    const { mainconfig, plugin, command } = require('../conf')
 
     // firstly we map commands to plugins, done through conf module - done
     // then parse actual commands outta say/sayteam event in this module
@@ -21,7 +21,7 @@ async function init()
     // also need to do search slot from player from playername as user types it
     // could point it to individual plugins too, maybe bad idea
 
-    const conf = require('./conf').mainconfig
+    const conf = require('../conf').mainconfig
     prefix = conf.cmd.prefix
     prefix_loud = conf.cmd.prefix_loud
 
