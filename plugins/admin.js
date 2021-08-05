@@ -2,15 +2,15 @@
 // makereg, unreg, putgroup, ungroup, say, time, seen, lookup, scream, find, clientinfo, kick, kickall, spank, spankall, permban, ban, banall, lastbans, baninfo, unban,
 // runas, aliases, warns, notice, warn, warntest, warnremove, warnclear, warninfo, maps, nextmap, spam, rules, spams, tempban, poke
 
-const db = require('../db')
-const { sendMsg, replacePlaceholder } = require('../msnger')
-const conf = require('../conf')
-const { groupOperations } = require('../groups')
-const rcon = require('../rcon')
-const clientModule = require('../client')
-const ErrorHandler = require('../errorhandler')
-const eventhandler = require('../eventhandler')
-const { msToTime } = require('../utility')
+const db = require.main.require('./utils/db')
+const { sendMsg, replacePlaceholder } = require.main.require('./utils/msnger')
+const conf = require.main.require('./conf')
+const { groupOperations } = require.main.require('./utils/groups')
+const rcon = require.main.require('./utils/rcon')
+const clientModule = require.main.require('./utils/client')
+const ErrorHandler = require.main.require('./src/errorhandler')
+const eventhandler = require.main.require('./src/eventhandler')
+const { msToTime } = require.main.require('./utils/utility')
 
 // vars for local use
 var mainconfig, pluginConf
@@ -127,7 +127,7 @@ module.exports =
     // iamgod: command used to make any player superadmin if they enter correct password
     cmd_iamgod: async function( slot, mode, cmdargs )
     {
-        const { highestLevel } = require('../groups')
+        const { highestLevel } = require.main.require('./utils/groups')
 
         if( !cmdargs.length )
             return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
@@ -257,7 +257,7 @@ module.exports =
     cmd_register: async function( slot, mode )
     {
         // return if player already higher group
-        const { lowestLevel } = require('../groups')
+        const { lowestLevel } = require.main.require('./utils/groups')
 
         var clientObj = await clientModule.getClientObj( slot )
         
