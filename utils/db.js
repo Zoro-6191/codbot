@@ -2,7 +2,7 @@
 const fs = require('fs')
 const mysql = require('promise-mysql')
 const { exit } = require('process')
-const ErrorHandler = require('./errorhandler')
+const ErrorHandler = require.main.require('./src/errorhandler')
 
 var requiredTables = [ 'aliases', 'clients', 'ctime', 'callvote',
 						// 'current_clients', 'current_svars', 	// TO-DO: later
@@ -17,8 +17,8 @@ module.exports =
 {
 	initMySQLdb: async function()
     {
-		const mainconfig = require('./conf').mainconfig
-		const { bot } = require('./eventhandler')
+		const mainconfig = require.main.require('./conf').mainconfig
+		const { bot } = require.main.require('./src/eventhandler')
 		
 		mysqldb = mainconfig.mysqldb
 
@@ -114,7 +114,7 @@ function checkConfigEntries( mysqldb )
 
 async function DBExistsGoAhead()
 {
-	const { bot } = require('./eventhandler')
+	const { bot } = require.main.require('./src/eventhandler')
 
 	var currentTables = []
 	var missingTables = []
@@ -166,7 +166,7 @@ async function DBExistsGoAhead()
 
 async function CreateMissingTables( missingTables )
 {
-	const { bot } = require('./eventhandler')
+	const { bot } = require.main.require('./src/eventhandler')
 	
 	console.log(`Missing Tables:`)
 	console.log(missingTables)

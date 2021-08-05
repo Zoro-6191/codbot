@@ -1,6 +1,6 @@
 // this file stores and updates currently playing clients based on their slot
-const db = require('./db')
-const ErrorHandler = require('../src/errorhandler')
+const db = require.main.require('./utils/db')
+const ErrorHandler = require.main.require('./src/errorhandler')
 
 // for local use
 var client

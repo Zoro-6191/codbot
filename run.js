@@ -1,13 +1,13 @@
 // this module initiates our bot
-const logread = require("./src/logread.js")
-const db = require('./db.js')
-const config = require('./conf')
-const rcon = require('./rcon.js')
 const eventhandler = require('./src/eventhandler')
+const logread = require("./src/logread.js")
 const cmdHandler = require('./src/commandhandler')
+const db = require('./utils/db.js')
+const rcon = require('./utils/rcon.js')
 const client = require('./utils/client.js')
 const groups = require("./utils/groups.js")
 const msnger = require('./utils/msnger')
+const config = require('./conf')
 const plugins = require('./plugins')
 // TO-DO: CLI?
 
