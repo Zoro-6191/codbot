@@ -1,7 +1,7 @@
 // commands: xlrstats, xlrhide, xlrtopstats
 
-const db = require('./db')
-const ErrorHandler = require('../errorhandler')
+const db = require.main.require('./utils/db')
+const ErrorHandler = require.main.require('./src/errorhandler')
 
 module.exports = 
 {

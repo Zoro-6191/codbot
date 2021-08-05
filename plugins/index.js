@@ -1,5 +1,5 @@
-const ErrorHandler = require('../src/errorhandler')
-const conf = require('../conf')
+const ErrorHandler = require.main.require('./src/errorhandler')
+const conf = require.main.require('./conf')
 
 module.exports.init = async function()
 {
