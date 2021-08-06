@@ -6,7 +6,7 @@ Codbot is a bot which works similar to [BigBrotherBot](https://github.com/BigBro
 - HTTP/FTP reading of log isn't supported. Logfile has to be locally available.
 
 # Requirements
-- Latest [NodeJS](https://nodejs.org/en/)(v16.4.2 atm)
+- Latest [NodeJS](https://nodejs.org/en/)(v16.5.0 atm)
 - Linux/MAC OS
 - Permission to read logfile locally available
 
