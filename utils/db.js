@@ -46,7 +46,7 @@ module.exports =
 			.catch( async (err) => 
 				{
 					if( err.code == 'ECONNREFUSED' )
-						ErrorHandler.fatal( `MySQL Server refused connection.\nThis means either the MySQL server is down or has blocked this IP Address.` )
+						ErrorHandler.fatal( `MySQL Server refused connection.\nThis means the MySQL server is either down or has blocked this IP Address.` )
 
 					if( err.code == 'ER_ACCESS_DENIED_ERROR' )
 						ErrorHandler.fatal( `MySQL ERROR:\n${err.sqlMessage}` )

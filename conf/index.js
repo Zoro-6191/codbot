@@ -44,16 +44,16 @@ function initConf()
 
     // check debug mode
     var debugvar = this.mainconfig.codbot.debug
-    if( typeof debugvar == 'boolean' && debugvar )
+    if( typeof debugvar == 'boolean' )
     {
-        this.DebugMode = true
-        console.log(`Debug Mode: On`)
-    }    
-    else
-    {
-        ErrorHandler.warning(`Debug mode only accepts boolean(true/false) as it's variable, and without quotes.\nDisabling Debug Mode.`)
-        console.log(`Debug Mode: Off`)
-    }
+        if(debugvar)
+        {
+            this.DebugMode = true
+            console.log(`Debug Mode: On`)
+        }
+        else console.log(`Debug Mode: Off`)
+    }  
+    else ErrorHandler.warning(`Debug mode only accepts boolean(true/false) as it's variable, and without quotes.\nDisabling Debug Mode.`)
 
     // check if timezone is mentioned correctly
     var tz = this.mainconfig.codbot.timezone
@@ -61,10 +61,11 @@ function initConf()
     {
         this.mainconfig.codbot.timezone = 'GMT'
         if( this.DebugMode || DetailedDebug )
-            console.log(`Bad Timezone Entry in config: "${tz}"`)
+            console.log(`Bad Timezone Entry in config: "${tz}\nUsing "GMT"`)
     }
     else if( this.DebugMode || DetailedDebug )
         console.log(`Timezone "${tz}" accepted.`)
+    else console.log(`TimeZone: ${tz}`)
 
     // now to read every other file except codbot.json and index.js
     // or take file names from ../plugins, map them to plugin_(name).json, better
@@ -81,6 +82,11 @@ function initConf()
     // splice( index, <deletecount> ) = delete specific element(s) from array
     pluginArr.splice( pluginArr.indexOf('index.js'),1)
 
+    if( DetailedDebug )
+    {
+        console.log(pluginArr)
+        console.log(`(Yet to remove non JS files)`)
+    }
     // now to create workable objects of their configs
     for( i=0; i<pluginArr.length; i++ )
     {
