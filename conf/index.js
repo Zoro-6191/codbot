@@ -4,6 +4,8 @@ const fs = require('fs')
 const { extname } = require('path')
 const ErrorHandler = require('../src/errorhandler')
 
+const DetailedDebug = false
+
 module.exports = 
 {
     initConf,
@@ -12,21 +14,32 @@ module.exports =
 
 function initConf()
 {
+    if( DetailedDebug )
+        console.log(`DETAILED DEBUG FOR CONF MODULE: ON\nInitializing Conf`)
+
     const { bot } = require('../src/eventhandler')
     const mainConfPath = './conf/codbot.json'
 
+    // check if main config file exists
+    if( DetailedDebug )
+        console.log(`Initializing Conf`)
+
     if( !fs.existsSync(mainConfPath) )
         ErrorHandler.fatal(`Main Config File "${mainConfPath}" not found`)
+    else if( DetailedDebug )
+        console.log(`Main Config File "${mainConfPath}" Exists`)
 
-    // JSON Syntax check
+    // JSON Syntax check, as well main config parse
     try
     {
         const mainconfig = cjson.parse(fs.readFileSync(mainConfPath).toString())
         this.mainconfig = mainconfig
+        if( DetailedDebug )
+            console.log(`Parsed ${mainConfPath}\nExported MainConfig`)
     }
     catch(e)
     {
-        ErrorHandler.fatal(`Incorrect JSON Syntax found in file: /conf/codbot.json\n${e}`)
+        ErrorHandler.fatal(`Incorrect JSON Syntax found in file: ${mainConfPath}\n${e}`)
     }
 
     // check debug mode
@@ -45,12 +58,21 @@ function initConf()
     // check if timezone is mentioned correctly
     var tz = this.mainconfig.codbot.timezone
     if( tz == undefined || !isValidTimeZone(tz))
+    {
         this.mainconfig.codbot.timezone = 'GMT'
+        if( this.DebugMode || DetailedDebug )
+            console.log(`Bad Timezone Entry in config: "${tz}"`)
+    }
+    else if( this.DebugMode || DetailedDebug )
+        console.log(`Timezone "${tz}" accepted.`)
 
     // now to read every other file except codbot.json and index.js
     // or take file names from ../plugins, map them to plugin_(name).json, better
     // then parse it to objects
     // store in global objects for use
+
+    if( DetailedDebug )
+        console.log(`Plugin Config Init`)
 
     var plugin = {}
 
@@ -137,9 +159,15 @@ function initConf()
     module.exports.command = command
 
     bot.emit('config_ready')
-    console.log("Initialized: Config")
+    
+    if( module.exports.DebugMode || DetailedDebug )
+    {
+        console.log(`Emitting "config_ready" Event`);
+        console.log("Initialized: Config")
+    }
 }
 
+// function to validate entered timezone
 function isValidTimeZone(tz) 
 {
     if (!Intl || !Intl.DateTimeFormat().resolvedOptions().timeZone)
@@ -150,7 +178,7 @@ function isValidTimeZone(tz)
         Intl.DateTimeFormat(undefined, {timeZone: tz});
         return true;
     }
-    catch (ex) 
+    catch(ex) 
     {
         return false;
     }

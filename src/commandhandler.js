@@ -31,7 +31,7 @@ async function init()
 async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig, command, plugin )
 {
     // remove extra white spaces from front and back
-    // content = content.trim()    
+    content = content.trim()    
     var mode;
 
     // teamchat has special blank space everytime, gotta remove it
