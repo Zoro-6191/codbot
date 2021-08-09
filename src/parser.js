@@ -1,7 +1,9 @@
 // this file parses each line and makes use outta em
 // events appear to be the best option for independent and togglable plugins
-const eventhandler = require('./eventhandler')
+const ErrorHandler = require.main.require('./src/errorhandler')
+const eventhandler = require.main.require('./src/eventhandler')
 
+// TO-DO: exception handling
 module.exports = 
 {
     parseLine

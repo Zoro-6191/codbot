@@ -38,9 +38,11 @@
         }
     },
 
+    // if you don't want a command, comment that line using "//", just like this line
+    // level required for command usage:
     "commands": 
     {
-        // level required for command usage:
+        // SUPERADMIN COMMANDS
         "putgroup": 100,
         "ungroup": 100,
         "runas": 100,
@@ -49,6 +51,7 @@
         "banall": 100,
         "kickall": 100,
 
+        // SENIORADMIN COMMANDS
         "clientinfo": 80,
         "mask": 80,
         "unmask": 80,
@@ -60,16 +63,19 @@
         "lookup": 80,
         "unban": 80,
 
+        // FULLADMIN COMMANDS
         "ban": 60,     // not permanent ban
         "tempban": 60,
         "kick": 60,
 
+        // ADMIN COMMANDS
         "baninfo": 40,
         "lastbans": 40,
         "admintest": 40,
         "scream": 40,
         "notice": 40,
 
+        // MODERATOR COMMANDS
         "find": 20,
         "aliases": 20,
         "warns": 20,
@@ -87,15 +93,18 @@
         "poke": 20,
         "codbot": 20,
 
+        // REGULAR COMMANDS
         "seen": 2,
         "maps": 2,
 
+        // USER COMMANDS
         "getss": 1,
         "nextmap": 1,
         "regulars": 1,
         "regtest": 1,
         "time": 1,
 
+        // GUEST COMMANDS
         "help": 0,
         "register": 0,
         "rules": 0,

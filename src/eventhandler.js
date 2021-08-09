@@ -1,6 +1,6 @@
 // this module manages all the events and provides accessibility to plugins
 const { DebugMode } = require.main.require('./conf')
-const ErrorHandler = require('./errorhandler')
+const ErrorHandler = require.main.require('./src/errorhandler')
 const { groupOperations } = require('../utils/groups')
 
 module.exports = 

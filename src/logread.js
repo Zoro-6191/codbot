@@ -2,7 +2,7 @@
 const fs = require('fs')
 const { Tail } = require('tail')
 const { exit } = require('process')
-const ErrorHandler = require('./errorhandler')
+const ErrorHandler = require.main.require('./src/errorhandler')
 
 module.exports = 
 {
@@ -11,10 +11,10 @@ module.exports =
 
 async function initLogRead()
 {
-    const parser = require('./parser.js')
+    const parser = require.main.require('./src/parser.js')
     const { extname } = require('path')
 
-    logpath = require('../conf').mainconfig.server.logfile
+    logpath = require.main.require('./conf').mainconfig.server.logfile
 
     // check if mentioned logfile exists
     if (!fs.existsSync(logpath)) 

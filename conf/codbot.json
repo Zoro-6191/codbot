@@ -5,7 +5,7 @@
         // debug mode: handle everything in debugging mode
         // recommended for plugin development
         // best to set it to "false" unless you know what you're doing
-        "debug": false,
+        "debug": true,
         
         // As to be attached to all bot msgs sent. Although server sided prefix will also be there, which by default is "^2Server: ^7"
         // to remove that, paste this in your server.cfg
