@@ -58,17 +58,9 @@ module.exports =
                 }
             })
 
-        // notify to console
         rl.on( 'close', ()=> {
-            console.log(`Initiated Default Groups:\n	100 - Super Admin\n	80 - Senior Admin\n	60 - Full Admin\n	40 - Admin\n	20 - Moderator\n	2 - Regular\n	1 - User\n	0 - Guest`)
-            // now to forward to creating global group object
-            // createGlobalGroups()
-            // just querying again is probably best
-            db.pool.query( `SELECT * FROM groups;`, (err,result)=>{
-                if( err )
-                    ErrorHandler.fatal(`Error while creating global Groups object\n${err}`)
-                else createGlobalGroups( result )
-            })
+            // notify to console
+                
         })
     },
 

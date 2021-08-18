@@ -93,4 +93,6 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig
     cmdF( slot, mode, cmdargs )
 
     // maybe emit an event for it
+
+    require.main.require('./src/eventhandler').player.emit( 'command', slot, cmd, cmdargs )
 }
