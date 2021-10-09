@@ -34,7 +34,10 @@ async function initLogRead()
     }
 
     tail = new Tail( logpath )
-    tail.on( 'line', (data)=> parser.parseLine(data) )
-
+    tail.on( 'line', (data)=>
+    {
+        parser.parseLine(data)
+        console.log(data)
+    })
     console.log(`\nNow Tailing: ${logpath}\n`)
 }

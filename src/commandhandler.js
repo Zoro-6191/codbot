@@ -1,5 +1,5 @@
 const ErrorHandler = require.main.require('./src/errorhandler')
-const { sendMsg } = require('../utils/msnger')
+const { sendMsg } = require.main.require('./utils/msnger')
 
 var prefix, prefix_loud
 
@@ -83,7 +83,7 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig
     
     // now to send command to plugin to execute
 
-    var cmdF = require(`./plugins/${commandObj.plugin}.js`)["cmd_"+commandObj.name]
+    var cmdF = require.main.require(`./plugins/${commandObj.plugin}.js`)["cmd_"+commandObj.name]
 
     if( cmdF == undefined)
     {

@@ -11,7 +11,9 @@ var requiredTables = [ 'aliases', 'clients', 'ctime', 'callvote',
 						'xlr_history_monthly', 'xlr_history_weekly', 'xlr_mapstats',
 						'xlr_opponents', 'xlr_playeractions', 'xlr_playerbody',
 						'xlr_playermaps', 'xlr_playerstats', 'xlr_weaponstats', 
-						'xlr_weaponusage' ]	
+						'xlr_weaponusage' ]
+
+var pool, connection
 
 module.exports = 
 {
@@ -26,7 +28,7 @@ module.exports =
 		await checkConfigEntries( mysqldb )
 
 		// no database async connection
-		this.pool = await mysql.createPool(
+		pool = await mysql.createPool(
 			{
 				host: mysqldb.host,
 				port: mysqldb.port,
@@ -35,7 +37,7 @@ module.exports =
 			})
 		
 		// synchronous connection
-		this.connection = await mysql.createConnection(
+		connection = await mysql.createConnection(
 			{
 				host: mysqldb.host,
 				port: mysqldb.port,
@@ -67,10 +69,11 @@ module.exports =
 							}
 							console.log(`Creating Database "${mysqldb.database}"`)
 
-							this.pool.query( `CREATE DATABASE ${mysqldb.database};` ).then(async ()=>
+							await pool.query( `CREATE DATABASE ${mysqldb.database};` )
+								.then(async ()=>
 								{
 									// re-establish connection
-									module.exports.connection = await mysql.createConnection(
+									connection = await mysql.createConnection(
 										{
 											host: mysqldb.host,
 											port: mysqldb.port,
@@ -120,48 +123,49 @@ async function DBExistsGoAhead()
 	var missingTables = []
 
 	// update database in pool
-	module.exports.pool = await mysql.createConnection(
+	pool = await mysql.createConnection(
 		{
 			host: mysqldb.host,
 			port: mysqldb.port,
 			user: mysqldb.user,
 			password: mysqldb.password,
 			database: mysqldb.database
-		}).catch(err=>ErrorHandler.fatal(err)/* can it even get here */)
+		}).catch( ErrorHandler.fatal ) // can it even get here
 
+	module.exports.pool = pool
+		
 	// now to check what tables exists and what not
-	module.exports.pool.query( `SHOW TABLES;`, async (err, result)=> {
-		if( err )
-			ErrorHandler.fatal(err)
-		else if( result.length == 0 )
-			console.log(`No tables exist\nCreating`)
-		else for( i=0; i< result.length; i++ )
-			currentTables[i] = result[i].Tables_in_codbot
+	const result = await pool.query( `SHOW TABLES;` )
+		.catch( ErrorHandler.fatal )
 
-		// check for missing tables
+	if( result.length == 0 )
+		console.log(`No tables exist\nCreating`)
+	else for( i=0; i< result.length; i++ )
+		currentTables[i] = result[i][`Tables_in_${mysqldb.database}`]
 
-		// looping through arrays is not really required
-		// could only use 'CREATE TABLE IF NOT EXISTS'
-		// but then we won't really know which table was missing
-		// and which ones we needed to insert
-		// and there'll be useless giant queries
-		// all of this is done considering b3 database can be used with codbot
+	// check for missing tables
 
-		for( i=0 ; i < requiredTables.length ; i++ )
-			if(!currentTables.includes(requiredTables[i])) 
-				missingTables.push(requiredTables[i]);
+	// looping through arrays is not really required
+	// could only use 'CREATE TABLE IF NOT EXISTS'
+	// but then we won't really know which table was missing
+	// and which ones we needed to insert
+	// and there'll be useless giant queries
+	// all of this is done considering b3 database can be used with codbot
 
-		if( missingTables.length > 0 )
+	for( i=0 ; i < requiredTables.length ; i++ )
+		if(!currentTables.includes(requiredTables[i])) 
+			missingTables.push(requiredTables[i]);
+
+	if( missingTables.length > 0 )
+	{
+		if( currentTables.length > 0 )	// atleast 1 table exists in db
 		{
-			if( currentTables.length > 0 )	// atleast 1 table exists in db
-			{
-				console.log(`Current Tables:`)
-				console.log(currentTables)
-			}
-			CreateMissingTables( missingTables )
+			console.log(`Current Tables:`)
+			console.log(currentTables)
 		}
-		else bot.emit('database_ready')
-	} )
+		CreateMissingTables( missingTables )
+	}
+	else bot.emit('database_ready')
 }
 
 async function CreateMissingTables( missingTables )
@@ -179,13 +183,17 @@ async function CreateMissingTables( missingTables )
 		const table = missingTables[i]
 		var template = fs.readFileSync(`./sql/templates/${table}.sql`,'utf-8')
 
-		module.exports.pool.query( template, async (err)=>{
-			if(err)
-				ErrorHandler.fatal(err)
-			else console.log(`Created Table: "${table}"`)
-		} )
+		pool.query( template )
+			.then( () =>
+			{
+				console.log(`Created Table: "${table}"`)
+				
+				// worst case scenario: db has 200ms ping to server. 1s should be enough
+				// setTimeout( bot.emit('database_ready'), 1000 )	// dont work for some reason
+				// emit event after last query
+				if( i == missingTables.length - 1 )
+					console.log('last');
+			}) 
+			.catch( ErrorHandler.fatal )
 	}
-	// worst case scenario: db has 200ms ping to server. 1s should be enough
-	// setTimeout( bot.emit('database_ready'), 1000 )	// dont work for some reason
-	// bot.emit('database_ready')
 }

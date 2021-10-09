@@ -1,7 +1,7 @@
 // this module manages all the events and provides accessibility to plugins
 const { DebugMode } = require.main.require('./conf')
 const ErrorHandler = require.main.require('./src/errorhandler')
-const { groupOperations } = require('../utils/groups')
+const { groupOperations } = require.main.require('./utils/groups')
 
 module.exports = 
 {
@@ -24,9 +24,9 @@ function initEventHandler()
 
 async function initPlayerConnect( guid, slot, ign )
 {
-    const db = require('./db')
-    const { rcontool } = require('./rcon')
-    const { client, updateClientInfo } = require('../utils/client')
+    const db = require.main.require('./utils/db')
+    const { rcontool } = require.main.require('./utils/rcon')
+    const { client, updateClientInfo } = require.main.require('./utils/client')
     
     player = module.exports.player
 
@@ -94,7 +94,7 @@ async function initPlayerConnect( guid, slot, ign )
 
 async function initPlayerDisconnect( guid, slot, ign )
 {
-    const { client } = require('../utils/client')
+    const { client } = require.main.require('./utils/client')
     player = module.exports.player
     // remove disconnected player from global client object
     // then emitting 'disconnect'
