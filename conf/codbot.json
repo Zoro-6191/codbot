@@ -20,7 +20,7 @@
         // password for direct superadmin promotion
         // Spaces not allowed, case sensitive
         // NEEDED: change this for security reasons
-        "iamgod_pass": "iamgodpassword"
+        "iamgod_pass": ""
     },
 
     // choose which plugins are enabled (true/false without quotes)
@@ -91,7 +91,7 @@
     {
         "host": "localhost",
         "port": 3306,   // default: 3306
-        "user": "codbot", // avoid root whenever possible
+        "user": "root", // avoid root whenever possible
         "password": "password",
         "database": "codbot"
     },
@@ -111,6 +111,6 @@
         "public_ip": "snr.vfesports.in",
 
         // bot cant work without proper logfile specification
-        "logfile": "H:/Games/Call of Duty Modern Warfare/mods/vf_snr_promod-ranked/games_mp.log"
+        "logfile": "/home/cod4/games_mp.log"
     }
 }

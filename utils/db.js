@@ -187,5 +187,5 @@ async function CreateMissingTables( missingTables )
 	}
 	// worst case scenario: db has 200ms ping to server. 1s should be enough
 	// setTimeout( bot.emit('database_ready'), 1000 )	// dont work for some reason
-	bot.emit('database_ready')
+	// bot.emit('database_ready')
 }

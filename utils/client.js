@@ -8,9 +8,11 @@ var client
 module.exports = 
 {
     init,
+    isSlotFilled,
     getClientInfo,
     getClientObj,
-    updateClientInfo
+    updateClientInfo,
+    getPlayerByNameToken
 }
 
 // TO-DO: aliascount, assists, deaths, ipaliascount, kills, ratio, roundsplayed, skill, suicides, teamdeaths, tk
@@ -75,6 +77,7 @@ async function init()
     for( i=0; i < onlinePlayers.length; i++ )
     {
         var slot = onlinePlayers[i].num    // we need slot num which is always unordered in
+        
         updateClientInfo( slot, "slot", slot )
         updateClientInfo( slot, "name", onlinePlayers[i].name )
         updateClientInfo( slot, "score", onlinePlayers[i].score )   // needed?
@@ -119,45 +122,39 @@ async function onConnect( guid, slot, ign )
     // aliascount, penaltiescount, ipaliascount
     // kills, deaths, assists, tk, teamdeaths, suicides, roundsplayed, ratio, skill, winstreak, losestreak, xlrhide from xlr_playerstats
 
-    db.pool.query(`SELECT * FROM xlr_playerstats WHERE client_id=${ clientObj.id }`, ( error, result ) => 
+    const result = await db.pool.query(`SELECT * FROM xlr_playerstats WHERE client_id=${ clientObj.id }`)
+        .catch( ErrorHandler.fatal )
+
+    // now result[0] cant be undefined coz event is 'connect' not 'firstconnect'
+    if( result.length )  // player registered
     {
-        if( error )
-            ErrorHandler.fatal( error )  // can't skip this. bot has to shut down.
-        if( result === undefined )  // nearly impossible
-            ErrorHandler.fatal(`Unexpected error while Connect event in client.js. 
-            Query returned undefined when it should have returned atleast empty set in all possible cases. 
-            Bot will Shut Down.`)
-        // now result[0] cant be undefined coz event is 'connect' not 'firstconnect'
-        if( result[0]!=undefined )  // player registered
-        {
-            updateClientInfo( slot, "registered", true )
-            updateClientInfo( slot, "kills", result[0].kills )
-            updateClientInfo( slot, "deaths", result[0].deaths )
-            updateClientInfo( slot, "assists", result[0].assists )
-            updateClientInfo( slot, "tk", result[0].teamkills )
-            updateClientInfo( slot, "teamdeaths", result[0].teamdeaths )
-            updateClientInfo( slot, "suicides", result[0].suicides )
-            updateClientInfo( slot, "ratio", result[0].ratio )
-            updateClientInfo( slot, "roundsplayed", result[0].rounds )
-            updateClientInfo( slot, "skill", result[0].skill )
-            updateClientInfo( slot, "xlrhide", result[0].hide )
-        }
-        else    // player not registered
-        {
-            updateClientInfo( slot, "registered", false )
-            updateClientInfo( slot, "kills", 0 )
-            updateClientInfo( slot, "deaths", 0 )
-            updateClientInfo( slot, "assists", 0 )
-            updateClientInfo( slot, "tk", 0 )
-            updateClientInfo( slot, "teamdeaths", 0 )
-            updateClientInfo( slot, "suicides", 0 )
-            updateClientInfo( slot, "ratio", 1.0 )
-            updateClientInfo( slot, "roundsplayed", 0 )
-            updateClientInfo( slot, "skill", 1000.0 )
-            updateClientInfo( slot, "xlrhide", 0 )
-        }
-        console.log(client)
-    })
+        updateClientInfo( slot, "registered", true )
+        updateClientInfo( slot, "kills", result[0].kills )
+        updateClientInfo( slot, "deaths", result[0].deaths )
+        updateClientInfo( slot, "assists", result[0].assists )
+        updateClientInfo( slot, "tk", result[0].teamkills )
+        updateClientInfo( slot, "teamdeaths", result[0].teamdeaths )
+        updateClientInfo( slot, "suicides", result[0].suicides )
+        updateClientInfo( slot, "ratio", result[0].ratio )
+        updateClientInfo( slot, "roundsplayed", result[0].rounds )
+        updateClientInfo( slot, "skill", result[0].skill )
+        updateClientInfo( slot, "xlrhide", result[0].hide )
+    }
+    else    // player not registered
+    {
+        updateClientInfo( slot, "registered", false )
+        updateClientInfo( slot, "kills", 0 )
+        updateClientInfo( slot, "deaths", 0 )
+        updateClientInfo( slot, "assists", 0 )
+        updateClientInfo( slot, "tk", 0 )
+        updateClientInfo( slot, "teamdeaths", 0 )
+        updateClientInfo( slot, "suicides", 0 )
+        updateClientInfo( slot, "ratio", 1.0 )
+        updateClientInfo( slot, "roundsplayed", 0 )
+        updateClientInfo( slot, "skill", 1000.0 )
+        updateClientInfo( slot, "xlrhide", 0 )
+    }
+    console.log(client)
 }
 
 // get whole clientObj of 1 player matching by slot
@@ -189,6 +186,53 @@ async function getClientInfo( slot, property )
     return clientObj[property]
 }
 
+async function getPlayerByNameToken( token )
+{
+    if( client == undefined )
+        return undefined
+
+    token = token.toLowerCase()
+    token = removeSpaces(token)
+
+    var resultsFound = []
+
+    for( var i = 0; i < client.length; i++ )
+    {
+        var nameTok = client[i].name.toLowerCase()
+
+        nameTok = removeSpaces(nameTok)
+        
+        if( nameTok.includes(token) )
+            resultsFound.push( client[i].slot )
+    }
+
+    return resultsFound
+}
+
+async function removeSpaces(str)
+{
+    for( var j = 0; j < str.length; j++ )
+    {
+        if( str[j] == ' ' )
+            str.splice(j,1)
+    }
+    return str
+}
+
+async function isSlotFilled( slot )
+{
+    if( client == undefined )
+        return false
+    
+    // TO-DO: improve from .find()?
+    var clientObj = client.find( client => client.slot == slot )
+    
+    if( clientObj == undefined )
+        return false
+
+    return true
+}
+
 // update 1 property of the clientObj which matches slot
 async function updateClientInfo( slot, property, value )
 {
@@ -209,16 +253,4 @@ async function updateClientInfo( slot, property, value )
         return ErrorHandler.minor(`Error in updateClientInfo(): one of the args was undefined.\nSLOT: ${slot}\nProperty: ${property}\nValue: ${value}`)
 
     clientObj[property] = value
-}
-
-// used to convert name substring 
-async function playerSearchFromName( mode, slot, nameStr )
-{
-    // mode = pm/global (!/@)
-    // slot = slot of guy typing the command
-    // nameStr = name guy typed
-
-    nameStr = nameStr.toLowerCase()
-
-    result = client.find( cl => cl.name.toLowerCase().includes(nameStr) )
 }

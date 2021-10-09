@@ -55,6 +55,14 @@ async function sendMsg( mode, slot, msg )
 
 async function replacePlaceholder( string, holder, value )
 {
-    string = string.replace(holder,value)
-    return string
+    return new Promise( resolve => 
+        {
+            string = string.replace(holder,value)
+            resolve(string)
+        })
+}
+
+function wait( ms )
+{
+    return new Promise( resolve => setTimeout( resolve, ms ) )
 }

@@ -16,9 +16,29 @@ const { msToTime } = require.main.require('./utils/utility')
 // vars for local use
 var mainconfig, pluginConf
 
+async function onConnect( guid, slot, ign )
+{
+    // update IP in IP table and clients table
+    // update current_clients table?
+    // take old name from clients table and push it to aliases table, and update new name in clients table
+    // increment connections column in clients table
+}
+
+async function onDisconnect( guid, slot, ign )
+{
+    // update lastedit/lastseen?
+}
+
 module.exports = 
 {
-    init,
+    init: async function()
+    {
+        pluginConf = conf.plugin.admin
+        mainconfig = conf.mainconfig
+
+        // player.on( 'connect', onConnect( guid, slot, ign) )
+        // player.on( 'disconnect', onDisconnect( guid, slot, ign) )
+    },
 
     // admins: get a list of online admins
     cmd_admins: async function( slot, mode, cmdargs )
@@ -55,31 +75,31 @@ module.exports =
     // aliases: command to check player's aliases used in the server
     cmd_aliases: async function( slot, mode, cmdargs )
     {
-        // for now we'll just get aliases everytime from db
-        // unless player is masked
-
         if( !cmdargs.length )
             return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
 
-        // get player from args and validate it
-        var arg = cmdargs[0]
-        if( !Number.isNaN( parseInt(arg) ) && parseInt(arg) <= 64 )
-            clientObj = await clientModule.getClientObj( arg )
+        if( !Number.isInteger( cmdargs[0] ) && parseInt(cmdargs[0]) <= 64 )
+            clientObj = await clientModule.getClientObj( cmdargs[0] )
 
         if( clientObj == undefined )
             return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
 
         if( clientObj.mask_level )
-            return sendMsg( mode, slot, pluginConf.messages.cmd_noaliases )
+            return sendMsg( mode, slot, pluginConf.messages.cmd_noaliases.replace('%player%', clientObj.name) )
 
         // now fetch aliases from aliases table
         const res = await db.pool.query( `SELECT * FROM aliases WHERE client_id=${clientObj.id}` )
+            .catch( sendMsg( mode, slot, pluginConf.messages.cmd_err_processing_cmd ) )
 
-        // query returned empty obj
-        if( res == {} )
-            return sendMsg( mode, slot, pluginConf.messages.cmd_noaliases )
+        if( !res.length )
+            return sendMsg( mode, slot, pluginConf.messages.cmd_noaliases.replace('%player%', clientObj.name) )
 
-        // TO-DO: do rest later xd
+        var aliasStr = ''
+
+        for( var i = 0; i < res.length; i++ )
+            aliasStr += res[i].alias + ', '
+        
+        return sendMsg( mode, slot, pluginConf.cmd_aliases.replace('%player%', clientObj.name).replace('%aliases%', aliasStr) )
     },
 
     // codbot: equivalent command to !b3.
@@ -149,8 +169,9 @@ module.exports =
         highestBits = await groupOperations.LevelToBits( highestLevel )
 
         // update in database
-        var q = db.pool.query( `UPDATE clients SET group_bits=${highestBits},time_edit=UNIX_TIMESTAMP() 
-        WHERE id=${parseInt(clientObj.id)}`).catch( (err)=>
+        const q = await db.pool.query( `UPDATE clients SET group_bits=${highestBits},time_edit=UNIX_TIMESTAMP() 
+        WHERE id=${clientObj.id}`)
+            .catch( err=>
             {
                 console.log(err)
                 ErrorHandler.warning(`Couldn't save updated group level of player ${clientObj.name} @${clientObj.id} to database`)
@@ -172,12 +193,11 @@ module.exports =
         {
             var arg = cmdargs[0]
             // get player from args and validate it
-            if( !Number.isNaN( parseInt(arg) ) && parseInt(arg) <=64 )
+            if( !Number.isInteger( arg ) && arg <= 64 )
                 clientObj = await clientModule.getClientObj( arg )
 
             if( clientObj == undefined )
                 return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
-
         }
         else clientObj = await clientModule.getClientObj( slot )
 
@@ -199,17 +219,37 @@ module.exports =
         return sendMsg( mode, slot, msg )
     },
 
+    // mag: change map and gametype together
+    cmd_mag: async function( slot, mode, cmdargs )
+    {
+        if( cmdargs.length < 2 )
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
+
+        var mentionedMap = cmdargs[0]
+
+
+        var mentionedGT = cmdargs[1]
+
+
+
+        
+    },
+
     // map: change map
     cmd_map: async function( slot, mode, cmdargs )
     {
-        var clientObj = await clientModule.getClientObj( slot )
+        var name = await clientModule.getClientInfo( slot, 'name' )
         
         // check if map exists in maplist
-        
+        if( !cmdargs.length )
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
+
+        // check if mentioned map is valid
+
 
         // if enabled, notify everyone who issued the command
         if( pluginConf.settings.notify_issuer )
-            sendMsg( 'g', slot, `^5${clientObj.name} has issued the command to change map to ${mapName}` )
+            sendMsg( 'g', slot, `^5${name} changed the  map to ${mapName}` )
     },
 
     // maps: display list of all maps from "codbot/conf/maps.txt"
@@ -238,20 +278,47 @@ module.exports =
             return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
         else
         {
-            var arg = cmdargs[0]
-            // get player from args and validate it
-            if( !Number.isNaN( parseInt(arg) ) && parseInt(arg) <= 64 )
-                clientObj = await clientModule.getClientObj( arg )
+            // here check for cmdargs, validate them and get player from them
+            if( Number.isInteger(cmdargs[0]) )
+            {
+                if( cmdargs[0] < 0 || cmdargs[0] > 64 )
+                    return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
 
-            if( clientObj == undefined )
-                return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
+                if( !isSlotFilled(cmdargs[0]) )
+                    return sendMsg( mode, slot, pluginConf.messages.cmd_err_no_players )
+
+                var playername = await clientModule.getClientInfo( cmdargs[0], 'name' )
+            }
+            else
+            {
+                var resultsFound = await clientModule.getPlayerByNameToken( cmdargs[0] )
+
+                if( !resultsFound.length )
+                    return sendMsg( mode, slot, pluginConf.messages.cmd_err_no_players )
+
+                if( resultsFound.length > 1 )
+                {
+                    var str = ``
+
+                    for( var i = 0; i < resultsFound.length; i++ )
+                    {
+                        str += `${await clientModule.getClientInfo( resultsFound[i], 'name' )}^3[^7${resultsFound[i]}^3]`
+
+                        if( i != resultsFound.length-1 )
+                            str += `^7, `
+                    }
+                    return sendMsg( mode, slot, pluginConf.messages.players_matched.replace('%arg%',cmdargs[0]).replace('%players%',str) )
+                }
+                else var playername = await clientModule.getClientInfo( resultsFound[0], 'name' )
+            }
         }
+
+        if( playername == undefined )
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd )
 
         let options = [ 'Wake up', '*poke*', 'Attention', 'Get up', 'Go', 'Move out' ]
 
-        let i = Math.floor(Math.random() * options.length)
-
-        return sendMsg('g', slot, `${options[i]} %player%!`.replace( '%player%', playername ) )
+        return sendMsg('g', slot, `${options[Math.floor(Math.random() * options.length)]} %player%!`.replace( '%player%', playername ) )
     },
 
     // register: promote guests to user, and enable their xlrstats
@@ -271,18 +338,26 @@ module.exports =
 
         // this way they get to keep the stats they earned this session, another improvement on b3
         // IGNORE = ignore errors, thus only creating row if it doesnt already exist based on client_id
-        db.pool.query(`INSERT IGNORE INTO xlr_playerstats 
-        SET client_id=${clientObj.id}, kills=${clientObj.kills}, deaths=${clientObj.deaths}
-        teamkills=${clientObj.tk}, teamdeaths=${clientObj.teamdeaths}, suicides=${clientObj.suicides},
-        ratio=${clientObj.ratio}, skill=${clientObj.skill}, rounds=${clientObj.roundsplayed}`)
-        .catch( (err)=> ErrorHandler.minor(err) )
-        .then( ()=> db.pool.query(`UPDATE clients SET group_bits=1 WHERE id=${clientObj.id}`) )
-        .catch( (err)=>
+        await db.pool.query(`
+            INSERT IGNORE INTO xlr_playerstats 
+            SET 
+                client_id=${clientObj.id}, 
+                kills=${clientObj.kills}, 
+                deaths=${clientObj.deaths}
+                teamkills=${clientObj.tk}, 
+                teamdeaths=${clientObj.teamdeaths}, 
+                suicides=${clientObj.suicides},
+                ratio=${clientObj.ratio}, 
+                skill=${clientObj.skill}, 
+                rounds=${clientObj.roundsplayed}`)
+        .catch( err=> ErrorHandler.minor(err) )
+        .then( db.pool.query(`UPDATE clients SET group_bits=1 WHERE id=${clientObj.id}`) )
+        .catch( err =>
             {
+                sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd )
                 ErrorHandler.warning(err)
-                return sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd )
             })
-        .then( (result)=> 
+        .then( ()=> 
             {
                 var confirmMsg = pluginConf.messages.regme_confirmation
                 confirmMsg = replacePlaceholder( confirmMsg, '%player%', clientObj.name )
@@ -313,51 +388,59 @@ module.exports =
         else
         {
             // here check for cmdargs, validate them and get player from them
-            
+            if( Number.isInteger(cmdargs[0]) )
+            {
+                if( cmdargs[0] < 0 || cmdargs[0] > 64 )
+                    return sendMsg( 'p', slot, pluginConf.messages.cmd_err_invalidparams )
+
+                if( !isSlotFilled(cmdargs[0]) )
+                    return sendMsg( mode, slot, pluginConf.messages.cmd_err_no_players )
+                    
+                var clientObj = await clientModule.getClientObj( cmdargs[0] )
+            }
+            else
+            {
+                var resultsFound = await clientModule.getPlayerByNameToken( cmdargs[0] )
+
+                if( !resultsFound.length )
+                    return sendMsg( mode, slot, pluginConf.messages.cmd_err_no_players )
+
+                if( resultsFound.length > 1 )
+                {
+                    var str = ``
+
+                    for( var i = 0; i < resultsFound.length; i++ )
+                    {
+                        str += `${await clientModule.getClientInfo( resultsFound[i], 'name' )}^3[^7${resultsFound[i]}^3]`
+
+                        if( i != resultsFound.length-1 )
+                            str += `^7, `
+                    }
+                    return sendMsg( mode, slot, pluginConf.messages.players_matched.replace('%arg%',cmdargs[0]).replace('%players%',str) )
+                }
+                else var clientObj = await clientModule.getClientObj( resultsFound[0] )
+            }
         }
+
+        if( clientObj == undefined )
+            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd ) 
 
         // check if they're already unmasked
         if( !clientObj.mask_level )
         {
-            if( cmdargs.length )    // cmder
+            if( !cmdargs.length )    // cmder
                 var msg1 = `You're already unmasked.`
             else var msg1 = `^1${clientObj.name} ^7is already unmasked.`
             return sendMsg( mode, slot, msg1 )
         }
         
         // unmask them and update it in db
-        try
-        {
-            db.pool.query( `UPDATE clients SET mask_level=0 WHERE id=${clientObj.id}` );
-            clientObj.mask_level = 0;
-            return sendMsg( mode, slot, `Unmasked ^2${cmdargs.length?clientObj.name='^7 ':''}` )
-        }
-        catch( err )
-        {
-            ErrorHandler.minor(err)
-            return sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd )
-        }
+        await db.pool.query( `UPDATE clients SET mask_level=0 WHERE id=${clientObj.id}` )
+            .catch( sendMsg( 'p', slot, pluginConf.messages.cmd_err_processing_cmd )  )
+            .then( ()=>
+            {
+                clientObj.mask_level = 0;
+                return sendMsg( mode, slot, `Unmasked ^2${cmdargs.length?clientObj.name='^7 ':''}` )
+            } )
     }
-}
-
-async function init()
-{
-    pluginConf = conf.plugin.admin
-    mainconfig = conf.mainconfig
-
-    // player.on( 'connect', onConnect( guid, slot, ign) )
-    // player.on( 'disconnect', onDisconnect( guid, slot, ign) )
-}
-
-async function onConnect( guid, slot, ign )
-{
-    // update IP in IP table and clients table
-    // update current_clients table?
-    // take old name from clients table and push it to aliases table, and update new name in clients table
-    // increment connections column in clients table
-}
-
-async function onDisconnect( guid, slot, ign )
-{
-    // update lastedit/lastseen?
 }
