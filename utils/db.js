@@ -3,6 +3,7 @@ const fs = require('fs')
 const mysql = require('promise-mysql')
 const { exit } = require('process')
 const ErrorHandler = require.main.require('./src/errorhandler')
+require('colors')
 
 var requiredTables = [ 'aliases', 'clients', 'ctime', 'callvote',
 						// 'current_clients', 'current_svars', 	// TO-DO: later
@@ -57,17 +58,17 @@ module.exports =
 					{
 						// maybe give user option to create a database right now
 						const rl = require("readline").createInterface({ input: process.stdin, output: process.stdout })
-						rl.question(`Database "${mysqldb.database}" doesn't exist. Create one right now? (y/n)\n-> `, async (input)=>
+						rl.question(`\nDatabase "${mysqldb.database}" doesn't exist.`.red.bgBlack +` Create one right now? (y/n)`.cyan.bgBlack+`\n-> `.cyan, async (input)=>
 						{
 							input = input.toLowerCase()
-							if(input!='y'&&input!='n'){ ErrorHandler.minor(`Invalid input: ${input}. Quitting..`);exit(1); }	// anything other than y/n
+							if( input != 'y' && input != 'n' ){ ErrorHandler.minor(`Invalid input: ${input}. Quitting..`);exit(1); }	// anything other than y/n
 							
 							if( input != 'y' )
 							{
 								ErrorHandler.minor(`Can't continue without a database. Quitting...`);
 								exit(1);
 							}
-							console.log(`Creating Database "${mysqldb.database}"`)
+							console.log(  `Creating Database "${mysqldb.database}"`.yellow )
 
 							await pool.query( `CREATE DATABASE ${mysqldb.database};` )
 								.then(async ()=>
@@ -82,7 +83,11 @@ module.exports =
 											database: mysqldb.database
 										}).catch( err => ErrorHandler.fatal(`Error in re-establishing connection to MySQL Server after creating DB\n${err}`) )
 								})
-								.then( DBExistsGoAhead )
+								.then( () =>
+								{
+									console.log(`- Done\n`.green)
+									DBExistsGoAhead()
+								})
 								.catch( err => ErrorHandler.fatal(`Error while creating database\n${err}`) )
 						})
 					}
@@ -137,7 +142,7 @@ async function DBExistsGoAhead()
 		.catch( ErrorHandler.fatal )
 
 	if( result.length == 0 )
-		console.log(`No tables exist\nCreating`)
+		console.log(`No tables exist in the database`.red+`\nCreating`.yellow)
 	else for( i=0; i< result.length; i++ )
 		currentTables[i] = result[i][`Tables_in_${mysqldb.database}`]
 
@@ -158,7 +163,7 @@ async function DBExistsGoAhead()
 	{
 		if( currentTables.length > 0 )	// atleast 1 table exists in db
 		{
-			console.log(`Current Tables:`)
+			console.log(`Existing Tables:`.yellow)
 			console.log(currentTables)
 		}
 		CreateMissingTables( missingTables )
@@ -168,7 +173,7 @@ async function DBExistsGoAhead()
 
 async function CreateMissingTables( missingTables )
 {
-	console.log(`Missing Tables:`)
+	console.log( `Missing Tables:`.red )
 	console.log(missingTables)
 
 	// now to take table schema from template and query it
@@ -179,10 +184,10 @@ async function CreateMissingTables( missingTables )
 		const table = missingTables[i]
 		var template = fs.readFileSync(`./sql/templates/${table}.sql`,'utf-8')
 
-		pool.query( template )
+		await pool.query( template )
 			.then( () =>
 			{
-				console.log(`Created Table: "${table}"`)
+				console.log( `Created Table: "${table}"` )
 				
 				// worst case scenario: db has 200ms ping to server. 1s should be enough
 				// setTimeout( bot.emit('database_ready'), 1000 )	// dont work for some reason
@@ -192,7 +197,7 @@ async function CreateMissingTables( missingTables )
 
 		if( i == missingTables.length - 1 )
 			{
-				console.log('last');
+				console.log('- Done Creating Missing Tables\n'.green);
 				TablesReadyGoAhead()
 			}
 	}
@@ -230,7 +235,7 @@ async function TablesReadyGoAhead()
 	else
 	{
 		// world id doesnt exist
-		console.log(`World ID doesn't exist yet.\nCreating`)
+		console.log(`World ID doesn't exist yet.`.red+`\n- Creating`.yellow)
 		await pool.query(`
 			INSERT INTO clients
 				(connections,guid,pbid,name,auto_login,time_add,time_edit)
@@ -246,7 +251,7 @@ async function TablesReadyGoAhead()
 			.catch( ErrorHandler.fatal )
 			.then( ()=>
 			{
-				console.log('Done');
+				console.log( '- Done\n'.green );
 				bot.emit('database_ready')
 			})
 	}
