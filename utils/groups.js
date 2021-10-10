@@ -12,16 +12,15 @@ module.exports.init = async function()
     // if empty, init default groups
     // create global group object, maybe along with methods
 
-    db.pool.query( `SELECT * FROM groups`, (err,result) => {
-        if( err )
-            ErrorHandler.fatal(`Error while creating global Groups object\n${err}`)
-        else if( result.length == 0 )   // no entries exist in table
-        {
-            // insert default groups to table
-            insertDefaultGroups()
-        }
-        else createGlobalGroups( result )
-    })
+    const result = await db.pool.query( `SELECT * FROM groups` ) 
+        .catch( ErrorHandler.fatal )
+
+    if( result.length == 0 )   // no entries exist in table
+    {
+        // insert default groups to table
+        insertDefaultGroups()
+    }
+    else createGlobalGroups( result )
 }
 
 module.exports.groupOperations = 
@@ -41,8 +40,8 @@ async function createGlobalGroups( queryResult )
 {
     globalGroups = []
     highestLevel = 0
-    lowestLevel = 100   // enough?
-    
+    lowestLevel = 256   // enough?
+
     Object.keys( queryResult ).forEach( key => 
     {
         globalGroups[globalGroups.length] = {}
@@ -173,22 +172,19 @@ async function insertDefaultGroups()
     // read individual line and query it while reading
     rl.on( 'line', (line)=>
         {
-            db.pool.query( line, (err,result)=>{
-                if(err)
-                    ErrorHandler.fatal(err)
-            })
+            db.pool.query( line )
+                .catch( ErrorHandler.fatal )
         })
 
     // notify to console
-	rl.on( 'close', ()=> {
+	rl.on( 'close', ()=> 
+    {
 		console.log(`Initiated Default Groups:\n	100 - Super Admin\n	80 - Senior Admin\n	60 - Full Admin\n	40 - Admin\n	20 - Moderator\n	2 - Regular\n	1 - User\n	0 - Guest`)
         // now to forward to creating global group object
         // createGlobalGroups()
         // just querying again is probably best
-        db.pool.query( `SELECT * FROM groups;`, (err,result)=>{
-            if( err )
-                ErrorHandler.fatal(`Error while creating global Groups object\n${err}`)
-            else createGlobalGroups( result )
-        })
-	})
+        db.pool.query( `SELECT * FROM groups` ) 
+            .catch( err => ErrorHandler.fatal(`Error while creating global Groups object\n${err}`) )
+            .then( result => createGlobalGroups( result ) )
+    })
 }

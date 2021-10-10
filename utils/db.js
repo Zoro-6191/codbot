@@ -20,8 +20,7 @@ module.exports =
 	initMySQLdb: async function()
     {
 		const mainconfig = require.main.require('./conf').mainconfig
-		const { bot } = require.main.require('./src/eventhandler')
-		
+
 		mysqldb = mainconfig.mysqldb
 
 		// now check if user has entered workable entries in config, has to be in sync
@@ -44,7 +43,8 @@ module.exports =
 				user: mysqldb.user,
 				password: mysqldb.password,
 				database: mysqldb.database
-			}).then( ()=> DBExistsGoAhead() )
+			})
+			.then( DBExistsGoAhead )
 			.catch( async (err) => 
 				{
 					if( err.code == 'ECONNREFUSED' )
@@ -82,7 +82,7 @@ module.exports =
 											database: mysqldb.database
 										}).catch( err => ErrorHandler.fatal(`Error in re-establishing connection to MySQL Server after creating DB\n${err}`) )
 								})
-								.then( ()=> DBExistsGoAhead() )
+								.then( DBExistsGoAhead )
 								.catch( err => ErrorHandler.fatal(`Error while creating database\n${err}`) )
 						})
 					}
@@ -112,13 +112,11 @@ function checkConfigEntries( mysqldb )
 			if( mysqldb[property].split(' ').length > 1 )
 				ErrorHandler.fatal(`Invalid Entry in JSON\nFile: /conf/codbot.json\nIn property "${property}" of mysqldb\nSpaces are not allowed: "${mysqldb[property]}"`)
 		}
-	});
+	})
 }
 
 async function DBExistsGoAhead()
 {
-	const { bot } = require.main.require('./src/eventhandler')
-
 	var currentTables = []
 	var missingTables = []
 
@@ -165,13 +163,11 @@ async function DBExistsGoAhead()
 		}
 		CreateMissingTables( missingTables )
 	}
-	else bot.emit('database_ready')
+	else TablesReadyGoAhead()
 }
 
 async function CreateMissingTables( missingTables )
 {
-	const { bot } = require.main.require('./src/eventhandler')
-	
 	console.log(`Missing Tables:`)
 	console.log(missingTables)
 
@@ -191,9 +187,67 @@ async function CreateMissingTables( missingTables )
 				// worst case scenario: db has 200ms ping to server. 1s should be enough
 				// setTimeout( bot.emit('database_ready'), 1000 )	// dont work for some reason
 				// emit event after last query
-				if( i == missingTables.length - 1 )
-					console.log('last');
 			}) 
 			.catch( ErrorHandler.fatal )
+
+		if( i == missingTables.length - 1 )
+			{
+				console.log('last');
+				TablesReadyGoAhead()
+			}
+	}
+}
+
+async function TablesReadyGoAhead()
+{
+	const { bot } = require.main.require('./src/eventhandler')
+
+	// check if "clients" table has WORLD id
+	const result = await pool.query(`SELECT * FROM clients WHERE id=1`)
+		.catch( ErrorHandler.fatal )
+
+	if( result.length )
+	{
+		if( result[0].guid == 'WORLD' )
+		{
+			// world id exists
+			// now we check its values and increment connections and time_edit
+			await pool.query(`
+			UPDATE
+				clients
+			SET
+				connections=connections+1,
+				time_edit=UNIX_TIMESTAMP()
+			WHERE
+				id=1
+			`)
+				.catch( ErrorHandler.fatal )
+				.then( bot.emit('database_ready') )
+		}
+		// ID 1 is occupied by a player's guid
+		else ErrorHandler.fatal( `WORLD ID doesn't exist in database. Cannot Continue. Resetting entire database is the only solution.` )
+	}
+	else
+	{
+		// world id doesnt exist
+		console.log(`World ID doesn't exist yet.\nCreating`)
+		await pool.query(`
+			INSERT INTO clients
+				(connections,guid,pbid,name,auto_login,time_add,time_edit)
+			VALUES(
+				1,
+				'WORLD',
+				'WORLD',
+				'World',
+				1,
+				UNIX_TIMESTAMP(),
+				UNIX_TIMESTAMP()
+			)`)
+			.catch( ErrorHandler.fatal )
+			.then( ()=>
+			{
+				console.log('Done');
+				bot.emit('database_ready')
+			})
 	}
 }
