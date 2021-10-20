@@ -1,6 +1,8 @@
 // this module takes care of sending messages to server/player
-const rcon = require.main.require('./utils/rcon.js')
-const conf = require.main.require('./conf')
+require('rootpath')()
+const rcon = require('utils/rcon.js')
+const conf = require('conf')
+const { wait } = require('utils/utility')
 
 module.exports = 
 {
@@ -43,26 +45,26 @@ module.exports.init = async function()
 
 async function sendMsg( mode, slot, msg )
 {
-    // send in sequences?
-    // changeline?
-    if( mode == 'p' )
-        rcon.rcontool.tell( slot, msg )
-    else if( mode == 'g')
-        rcon.rcontool.say( msg )
+    msg = msg.match(/.{1,100}/g)    // divide into 100 char divisions
 
-    // max string length in chat?
+    for( var i = 0; i  < msg.length; i++ )
+    {
+        if( mode == 'p' )
+            rcon.rcontool.tell( slot, msg[i] )
+        else if( mode == 'g')
+            rcon.rcontool.say( msg[i] )
+        
+        await wait( 500 )
+    }
 }
 
 async function replacePlaceholder( string, holder, value )
 {
-    return new Promise( resolve => 
-        {
-            string = string.replace(holder,value)
-            resolve(string)
-        })
-}
-
-function wait( ms )
-{
-    return new Promise( resolve => setTimeout( resolve, ms ) )
+    return new Promise( (resolve,reject) => 
+    {
+        if( typeof string != "string" )
+            reject('NOT_STRING')
+        string = string.replace(holder,value)
+        resolve(string)
+    })
 }

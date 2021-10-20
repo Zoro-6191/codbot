@@ -1,7 +1,8 @@
 // this module takes care of admin groups
+require('rootpath')()
 const fs = require('fs')
-const db = require.main.require('./utils/db')
-const ErrorHandler = require.main.require('./src/errorhandler')
+const db = require('utils/db')
+const ErrorHandler = require('src/errorhandler')
 
 // for local use
 var globalGroups, highestLevel
@@ -18,6 +19,7 @@ module.exports.init = async function()
     if( result.length == 0 )   // no entries exist in table
     {
         // insert default groups to table
+        console.log(`\nNo User groups found in "groups" table`.red);
         insertDefaultGroups()
     }
     else createGlobalGroups( result )
@@ -33,7 +35,17 @@ module.exports.groupOperations =
     KeywordToName,
     LevelToBits,
     LevelToKeyword,
-    LevelToName
+    LevelToName,
+    isValidKeyword
+}
+
+async function isValidKeyword( token )
+{
+    token = token.toLowerCase()
+    for( var i = 0; i < globalGroups.length; i++ )
+        if( globalGroups[i].keyword == token )
+            return true
+    return false
 }
 
 async function createGlobalGroups( queryResult )
@@ -41,6 +53,8 @@ async function createGlobalGroups( queryResult )
     globalGroups = []
     highestLevel = 0
     lowestLevel = 256   // enough?
+
+    const { bot } = require('src/eventhandler')
 
     Object.keys( queryResult ).forEach( key => 
     {
@@ -63,6 +77,15 @@ async function createGlobalGroups( queryResult )
     module.exports.globalGroups = globalGroups
     module.exports.highestLevel = highestLevel
     module.exports.lowestLevel = lowestLevel
+
+    console.log(`\nUser Group Setting:`.green);
+
+    for( var i = 0; i < globalGroups.length; i++ )
+        console.log(`${globalGroups[i].level} - ${globalGroups[i].name}`.gray)
+
+    console.log('')
+
+    bot.emit(`groups_ready`)
 }
 
 function BitsToLevel( bits )
@@ -101,7 +124,7 @@ function KeywordToName( token )
     // TO-DO: regex l8r
     token = token.toLowerCase()
 
-    var obj = globalGroups.find( obj => obj.keyword == keyword )
+    var obj = globalGroups.find( obj => obj.keyword == token )
 
     if( obj == undefined )
         return undefined
@@ -113,7 +136,7 @@ function KeywordToLevel( token )
 {
     token = token.toLowerCase()
 
-    var obj = globalGroups.find( obj => obj.keyword == keyword )
+    var obj = globalGroups.find( obj => obj.keyword == token )
 
     if( obj == undefined )
         return undefined
@@ -125,7 +148,7 @@ function KeywordToBits( token )
 {
     token = token.toLowerCase()
 
-    var obj = globalGroups.find( obj => obj.keyword == keyword )
+    var obj = globalGroups.find( obj => obj.keyword == token )
 
     if( obj == undefined )
         return undefined
@@ -179,12 +202,16 @@ async function insertDefaultGroups()
     // notify to console
 	rl.on( 'close', ()=> 
     {
-		console.log(`Initiated Default Groups:\n	100 - Super Admin\n	80 - Senior Admin\n	60 - Full Admin\n	40 - Admin\n	20 - Moderator\n	2 - Regular\n	1 - User\n	0 - Guest`)
+		console.log(`Inserting Default Groups`.yellow)
         // now to forward to creating global group object
-        // createGlobalGroups()
+
         // just querying again is probably best
         db.pool.query( `SELECT * FROM groups` ) 
             .catch( err => ErrorHandler.fatal(`Error while creating global Groups object\n${err}`) )
-            .then( result => createGlobalGroups( result ) )
+            .then( result => 
+                {
+                    console.log(`- Done\n`.green);
+                    createGlobalGroups( result )
+                })
     })
 }

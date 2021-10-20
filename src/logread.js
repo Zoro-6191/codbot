@@ -1,8 +1,9 @@
 // this file reads each line from the log
+require('rootpath')()
 const fs = require('fs')
 const { Tail } = require('tail')
 const { exit } = require('process')
-const ErrorHandler = require.main.require('./src/errorhandler')
+const ErrorHandler = require('src/errorhandler')
 
 module.exports = 
 {
@@ -11,10 +12,10 @@ module.exports =
 
 async function initLogRead()
 {
-    const parser = require.main.require('./src/parser.js')
+    const parser = require('src/parser.js')
     const { extname } = require('path')
 
-    logpath = require.main.require('./conf').mainconfig.server.logfile
+    logpath = require('conf').mainconfig.server.logfile
 
     // check if mentioned logfile exists
     if (!fs.existsSync(logpath)) 
@@ -37,7 +38,7 @@ async function initLogRead()
     tail.on( 'line', (data)=>
     {
         parser.parseLine(data)
-        console.log(data)
+        // console.log(data)
     })
     console.log(`\nNow Tailing: ${logpath}\n`)
 }

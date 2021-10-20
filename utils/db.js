@@ -1,8 +1,9 @@
 // this module takes care of mysql database and its connectivity to rest of the project
+require('rootpath')()
 const fs = require('fs')
 const mysql = require('promise-mysql')
 const { exit } = require('process')
-const ErrorHandler = require.main.require('./src/errorhandler')
+const ErrorHandler = require('src/errorhandler')
 require('colors')
 
 var requiredTables = [ 'aliases', 'clients', 'ctime', 'callvote',
@@ -20,7 +21,7 @@ module.exports =
 {
 	initMySQLdb: async function()
     {
-		const mainconfig = require.main.require('./conf').mainconfig
+		const mainconfig = require('conf').mainconfig
 
 		mysqldb = mainconfig.mysqldb
 
@@ -58,7 +59,7 @@ module.exports =
 					{
 						// maybe give user option to create a database right now
 						const rl = require("readline").createInterface({ input: process.stdin, output: process.stdout })
-						rl.question(`\nDatabase "${mysqldb.database}" doesn't exist.`.red.bgBlack +` Create one right now? (y/n)`.cyan.bgBlack+`\n-> `.cyan, async (input)=>
+						rl.question(`\n Database "${mysqldb.database}" doesn't exist.`.red.bgBlack +` Create one right now? (y/n)`.cyan.bgBlack+`\n-> `.cyan, async (input)=>
 						{
 							input = input.toLowerCase()
 							if( input != 'y' && input != 'n' ){ ErrorHandler.minor(`Invalid input: ${input}. Quitting..`);exit(1); }	// anything other than y/n
@@ -205,7 +206,7 @@ async function CreateMissingTables( missingTables )
 
 async function TablesReadyGoAhead()
 {
-	const { bot } = require.main.require('./src/eventhandler')
+	const { bot } = require('src/eventhandler')
 
 	// check if "clients" table has WORLD id
 	const result = await pool.query(`SELECT * FROM clients WHERE id=1`)

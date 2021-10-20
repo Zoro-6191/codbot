@@ -1,3 +1,4 @@
+require('rootpath')()
 
 module.exports = 
 {
@@ -15,5 +16,10 @@ module.exports =
         Time = `${days?(days==1?days+' Day ':days+' Days '):''}${hours?(hours==1?hours+' Hour ':hours+' Hours '):''}${minutes?(minutes==1?minutes+' min ':minutes+' mins '):''}${seconds?(seconds==1?seconds+' sec ':seconds+' secs '):''}`
 
         return Time
+    },
+
+    wait: async function( ms )
+    {
+        return new Promise( resolve => setTimeout( resolve, ms ) )
     }
 }

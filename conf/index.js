@@ -1,8 +1,9 @@
 // this file reads all configs (.ini) and then convert them into smart objects
+require('rootpath')()
 const cjson = require('comment-json')
 const fs = require('fs')
 const { extname } = require('path')
-const ErrorHandler = require('../src/errorhandler')
+const ErrorHandler = require('src/errorhandler')
 
 const DetailedDebug = false
 
@@ -17,7 +18,7 @@ function initConf()
     if( DetailedDebug )
         console.log(`DETAILED DEBUG FOR CONF MODULE: ON\nInitializing Conf`)
 
-    const { bot } = require('../src/eventhandler')
+    const { bot } = require('src/eventhandler')
     const mainConfPath = './conf/codbot.json'
 
     // check if main config file exists

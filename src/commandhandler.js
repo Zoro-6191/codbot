@@ -1,5 +1,8 @@
-const ErrorHandler = require.main.require('./src/errorhandler')
-const { sendMsg } = require.main.require('./utils/msnger')
+require('rootpath')()
+const ErrorHandler = require('src/errorhandler')
+const { sendMsg } = require('utils/msnger')
+const { getClientInfo } = require('utils/client')
+const { LevelToName } = require('utils/groups').groupOperations
 
 var prefix, prefix_loud
 
@@ -10,18 +13,11 @@ module.exports =
 
 async function init()
 {
-    const { player } = require.main.require('./src/eventhandler')
-    const { rcontool } = require.main.require('./utils/rcon')
-    const { mainconfig, plugin, command } = require.main.require('./conf')
+    const { player } = require('src/eventhandler')
+    const { rcontool } = require('utils/rcon')
+    const { mainconfig, plugin, command } = require('conf')
 
-    // firstly we map commands to plugins, done through conf module - done
-    // then parse actual commands outta say/sayteam event in this module
-    // maybe then even emit a separate event for it like emit('command',slot,cmd,args), maybe not good idea
-    // or just point it directly to plugins, better
-    // also need to do search slot from player from playername as user types it
-    // could point it to individual plugins too, maybe bad idea
-
-    const conf = require.main.require('./conf').mainconfig
+    const conf = require('conf').mainconfig
     prefix = conf.cmd.prefix
     prefix_loud = conf.cmd.prefix_loud
 
@@ -66,8 +62,7 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig
     cmdargs.shift()    // arguments will be an array so any number of args are possible
 
     // now to find if that command is in any of the plugins' config, even as alias
-    // if alias, point to correct command
-    
+    // if alias, point to correct command    
     var checkname = command.find( zz => zz.name == cmd )
     var checkalias = command.find( zz => zz.alias == cmd )
 
@@ -80,11 +75,13 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig
     // now check if that plugin is enabled
     if( !mainconfig.plugins[commandObj.plugin] )
         return sendMsg( 'p', slot, plugin.admin.messages.cmd_err_plugin_disabled.replace('%cmd%',cmd).replace('%plugin%',commandObj.plugin) )
+
+    // now check if commander has permission to use the command
+    if( await getClientInfo( slot, 'group_level' ) < commandObj.minpower )
+        return sendMsg( mode, slot, plugin.admin.messages.cmd_err_noaccess.replace('%prefix%',prefix).replace('%cmd%',cmd).replace('%groupname%',await LevelToName(commandObj.minpower)) )
     
     // now to send command to plugin to execute
-
     var cmdF = require.main.require(`./plugins/${commandObj.plugin}.js`)["cmd_"+commandObj.name]
-
     if( cmdF == undefined)
     {
         ErrorHandler.warning(`Command Function for command "${commandObj.name}" of plugin "${commandObj.plugin}" not defined.`)
@@ -92,7 +89,6 @@ async function processChatforCMD( guid, slot, ign, content, rcontool, mainconfig
     }
     cmdF( slot, mode, cmdargs )
 
-    // maybe emit an event for it
-
-    require.main.require('./src/eventhandler').player.emit( 'command', slot, cmd, cmdargs )
+    // emit a ( currently useless ) event for it
+    require('src/eventhandler').player.emit( 'command', slot, cmd, cmdargs )
 }

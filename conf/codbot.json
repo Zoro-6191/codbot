@@ -15,7 +15,7 @@
         "chatprefix": "^1[^3CODBOT^1]^7:",
 
         // bot timezone
-        "timezone": "IST",
+        "timezone": "CET",
 
         // password for direct superadmin promotion
         // Spaces not allowed, case sensitive
@@ -66,7 +66,7 @@
         "spree": false,
 
         // xlrstats plugin: for storing player kills/deaths etc when they're registered
-        "xlr": false
+        "xlr": true
     },
 
     // command settings
@@ -91,9 +91,9 @@
     {
         "host": "localhost",
         "port": 3306,   // default: 3306
-        "user": "root", // avoid root whenever possible
+        "user": "user", // avoid root whenever possible
         "password": "password",
-        "database": "codbot"
+        "database": "database"
     },
 
     // cod4 server info
@@ -108,9 +108,9 @@
         "rcon_password": "rconpass",
 
         // domain name works too. eg: "143.110.191.162" or "snr.vfesports.in"
-        "public_ip": "snr.vfesports.in",
+        "public_ip": "de.vfesports.in",
 
         // bot cant work without proper logfile specification
-        "logfile": "/home/cod4/games_mp.log"
+        "logfile": "/path/to/log/games_mp.log"
     }
 }

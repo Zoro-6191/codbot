@@ -24,7 +24,8 @@
         "announce_registration": true,  // show a message to all users when a user registered himself. Encourages other Users to register too. - use true or false
         "past_bans_check_rate:": 10,  // show a message to all users when a user registered himself. Encourages other Users to register too. - use true or false
         "notify_issuer": true,  // notify in chat who issued the command in commands: !map, !gametype, !mag
-        "warn": {
+        "warn": 
+        {
             "pm_global": false,     // determines whether the warning is sent to the the whole server (true), or just the player and admin (false), to reduce chatbox spam.
             "alert_kick_num": 3,    // if a player reach this number of active warnings he will be notified by with message then tempbanned
             "instant_kick_num": 5,  // if a player reach this number of active warnings he will be tempbanned right away
@@ -56,7 +57,9 @@
         "mask": 80,
         "unmask": 80,
         "permban": 80,
+        "mag": 80,
         "map": 80,
+        "gametype": 80,
         "maprotate": 80,
         "warnclear": 80,
         "clear": 80,
@@ -71,6 +74,7 @@
         // ADMIN COMMANDS
         "baninfo": 40,
         "lastbans": 40,
+        "longlist": 40,
         "admintest": 40,
         "scream": 40,
         "notice": 40,
@@ -110,8 +114,10 @@
         "rules": 0,
         "iamgod": 0
     },
+
     // assign aliases to commands, can't be more than 1
-    "commandalias": {
+    "commandalias": 
+    {
         "admins": "ad",
         "ban": "b",
         "aliases": "aa",
@@ -129,6 +135,7 @@
         "regulars": "regs",
         "rules": "r",
         "runas": "su",
+        "scream": "sc",
         "tempban": "tb",
         "warn": "w",
         "warnclear": "wc",
@@ -155,6 +162,7 @@
         "lastbans": "Get a list of Latest Bans",
         "leveltest": "Get player's level/group",
         "list": "Get a List of Online Players",
+        "longlist": "Get a long list of online players",
         "makereg": "Put a player in Regular group",
         "map": "Change map",
         "maprotate": "Change to next map in the pool",
@@ -211,6 +219,7 @@
         "lastbans": "^7%prefix%^7lastbans",
         "leveltest": "^7%prefix%^7leveltest <player/@id>",
         "list": "^7%prefix%^7list",
+        "longlist": "^7%prefix%^7longlist",
         "makereg": "^7%prefix%^7makereg <player/@id>",
         "map": "^7%prefix%^7map <map>",
         "maprotate": "^7%prefix%^7maprotate",
@@ -250,7 +259,8 @@
         "cmd_err_processing_cmd": "Error processing your command",
         "cmd_err_unknown_cmd": "^7Unknown command ^1%cmd%^7",
         "cmd_err_invalidparams": "^7Invalid parameters",
-        "cmd_err_noaccess": "^7You need to be in group ^1%groupname% ^7to use ^3&prefix^3%cmd%",
+        "cmd_err_noreg": "^7You need to be in ^1registered ^7to use ^3%prefix%^3%cmd%",
+        "cmd_err_noaccess": "^7You need to be in group ^1%groupname% ^7to use ^3%prefix%^3%cmd%",
         "cmd_err_noreason": "^1ERROR: ^7No Reason Supplied",
         "cmd_err_maskedhigherlevel": "^7%player% ^7is a masked higher level player, action cancelled",
         "cmd_err_no_players": "^7No players found",
@@ -264,13 +274,16 @@
         "cmd_err_warn_too_fast": "^7Only one warning per &warnsecs seconds can be issued",
         "cmd_err_warn_self": "^7Can't warn yourself",
         "cmd_err_ban_self": "^75player%^7, ^7Can't ban yourself",
+        "cmd_err_notinserver": "That player is currently not in the server",
+        "cmd_err_unknownmap": "Unknown Map ^1%map%",
+        "cmd_err_unknowngt": "Unknown Gametype ^1%gametype%",
         "cmd_baninfo": "^2%player% ^7has &numbans active ban(s)",
         "cmd_baninfo_no_bans": "^2%player% ^7has no active bans",
-        "cmd_group_unknown": "^7Group %groupname% does not exist",
+        "cmd_group_unknown": "^7Group ^1%groupname% ^7does not exist",
         "cmd_group_beyond_reach": "^7Group %groupname% is beyond your reach",
         "cmd_cleared_warnings": "%(admin)s^7 has cleared %(player)s^7 of all tk-points and warnings",
         "cmd_cleared_warnings_for_all": "%(admin)s^7 has cleared everyone's tk-points and warnings",
-        "cmd_help_available": "^7Available commands: %cmd%s",
+        "cmd_help_available": "^7Available commands: %cmd%",
         "cmd_groups_in": "^7%player%^7 is in groups &groups",
         "cmd_say": "^7%player%^7: &text",
         "cmd_player_id": "^2%player% ^7[^3%id%^7]",
@@ -278,29 +291,29 @@
         "cmd_lookup_found": "^7[^2@%id%^7] ^3&name^7 [^3%s^7]",
         "groups_welcome": "^7You are now in group ^2%groupname%",
         "warn_denied": "^7%player%^7 is a higher level admin, can't warn",
-        "groups_already_in": "^7%player%^7 is already in group %groupname%",
+        "groups_already_in": "^1%player%^7 is already in group ^3%groupname%",
         "players_matched": "^7Players matching ^2%arg%^7: %players%",
-        "regme_confirmation": "^7Thanks for your registration. You are now in group ^7%groupname%",
+        "regme_confirmation": "^7Thanks for your registration. You are now in group ^%groupname%",
         "regme_announce": "^3%player% ^7registered",
         "groups_added": "^1%player% ^7added to group ^2%groupname%",
-        "groups_put": "^7%player% ^7put in group %groupname%",
+        "groups_put": "^2%player% ^7put in group ^3%groupname%",
         "groups_none": "^7%player% ^7is not in any groups",
         "help_command": "^2%s%s ^7%s",
         "regme_regged": "^7You are now in group ^2%groupname%",
         "help_none": "^7No Commands available for you",
-        "cmd_admins": "^7Admins online: &admins%",
+        "cmd_admins": "^7Admins online: %admins%",
         "noadmin": "^7There are no admins online",
         "cmd_regulars": "^7Regular players online: %s",
         "cmd_no_regulars": "^7There are no regular players online",
-        "cmd_time": "Time: &time",
+        "cmd_time": "Time: %time%",
         "cmd_leveltest": "^2%player% ^7[^3@%id%^7] is a ^3%groupname% ^7[^2%level%^7] since %since%",
         "leveltest_nogroups": "^7%player% ^7[^3@%id%^7] is not in any groups",
-        "cmd_aliases": "^7%player%^7 aliases: ^7&aliases",
+        "cmd_aliases": "^7%player%^7 aliases: ^7%aliases%",
         "cmd_aliases_moresuffix": "^7[^2and more^7]",
         "cmd_noaliases": "^7%player%^7 has no aliases",
-        "cmd_warningmsg": "^1WARNING^7 [^3%warnings%^7]: &reason",
-        "reason_too_many_warnings": "^7too many warnings: &reason",
-        "warning_autokick_alert": "^1ALERT^7: &name^7 auto-kick from warnings if not cleared [^3%warnings%^7] &reason"
+        "cmd_warningmsg": "^1WARNING^7 [^3%warnings%^7]: %reason%",
+        "reason_too_many_warnings": "^7too many warnings: %reason%",
+        "warning_autokick_alert": "^1ALERT^7: %name%^7 auto-kick from warnings if not cleared [^3%warnings%^7] &reason"
     },
 
     // Define here shortcuts for warning reasons. Those shortcuts can be used with the !kick, !tempban, !ban, and !permban commands.

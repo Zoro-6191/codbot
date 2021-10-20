@@ -2,4 +2,43 @@
     "name": "Vote Plugin",
     "desc": "Manages all chat voting stuff",
     
+    "commands":
+    {
+        "vote": 1,
+        "votekick": 1,
+        "voteban": 1,
+        "votemap": 1,
+        "votegametype": 1,
+        "no": 1,
+        "yes": 1,
+    },
+    "commandalias":
+    {
+        "votekick": "vk",
+        "voteban": "vb",
+        "votemap": "vm",
+        "votegametype": "vgt",
+        "no": "n",
+        "yes": "y",
+    },
+    "commandhelp":
+    {
+        "vote": "Start a vote",
+        "votekick": "Votekick a Player",
+        "voteban": "Voteban a Player",
+        "votemap": "Start a vote to change the map",
+        "votegametype": "Start a vote to change gametype",
+        "no": "Vote no to current voting topic",
+        "yes": "Vote yes to current voting topic",
+    },
+    "commandusage":
+    {
+        "vote": "^7%prefix%^7vote <text>",
+        "votekick": "^7%prefix%^7votekick <player>",
+        "voteban": "^7%prefix%^7voteban <player>",
+        "votemap": "^7%prefix%^7votemap <map>",
+        "votegametype": "^7%prefix%^7votegametype <gametype>",
+        "no": "^7%prefix%^7no",
+        "yes": "^7%prefix%^7yes",
+    },
 }

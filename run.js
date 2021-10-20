@@ -9,32 +9,29 @@ const groups = require("./utils/groups.js")
 const msnger = require('./utils/msnger')
 const config = require('./conf')
 const plugins = require('./plugins')
+const maps = require('./utils/maps')
+const gametypes = require('./utils/gametypes')
 // TO-DO: CLI?
 
-// =================================================
-// create read stream - done
-// setup general rcon use - done
-// connect to mysql db and keep it alive - done
-// analyze each line and emit events for it - done
-// create a standard for the plugins
-// create a standard for commands
-// proper error and exception handling
-// =================================================
-// console.log( Math.floor(Date.now()/1000) )
-
-eventhandler.initEventHandler() // juice
+eventhandler.initEventHandler() // backbone
 config.initConf()   // read all configurations
 db.initMySQLdb()  // can take seconds depending upon database server ping and if it's initial setup
 
-eventhandler.bot.once( 'database_ready', ()=> 
+eventhandler.bot.once( 'database_ready', async ()=> 
     {
-        groups.init()   // register all admin groups
-        rcon.initRcon()    // create UDP socket for rcon
-        client.init()   // global client object
-        msnger.init()   // chat rcon messenger
-        logread.initLogRead()  // begin reading logfile
-        cmdHandler.init()   // process all incoming commands
-        plugins.init()
+        await groups.init()   // register all user groups
+        maps.init()
+        gametypes.init()
+    })
+
+eventhandler.bot.once( 'groups_ready', async () =>
+    {
+        await rcon.initRcon()    // create UDP socket for rcon
+        await msnger.init()   // chat rcon messenger
+        await client.init()   // global client object        
+        await plugins.init()    // plugin init
+        await logread.initLogRead()  // begin reading logfile
+        await cmdHandler.init()   // process all incoming commands
     })
 
 eventhandler.bot.emit('ready')

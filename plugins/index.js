@@ -1,17 +1,24 @@
-const { DebugMode } = require.main.require('./conf')
-const ErrorHandler = require.main.require('./src/errorhandler')
-const conf = require.main.require('./conf')
+require('rootpath')()
+require('colors')
+const { DebugMode } = require('conf')
+const ErrorHandler = require('src/errorhandler')
+const conf = require('conf')
 
 module.exports.init = async function()
 {
-    // take plugin names outta mainconfig and call init
-    // thats all
-    
-    var plugins = conf.mainconfig.plugins
+    var enabledPlugins = []
+    var pluginsConf = conf.mainconfig.plugins
 
-    Object.keys(plugins).forEach( pl =>
-        {
-            if(plugins[pl])
-                require(`./${pl}.js`).init()
-        })
+    Object.keys(pluginsConf).forEach( async pl =>
+    {
+        if(pluginsConf[pl])
+            enabledPlugins.push(pl)
+    })
+
+    for( var i = 0; i < enabledPlugins.length; i++ )
+    {
+        process.stdout.write(`Initializing "${enabledPlugins[i]}" Plugin`.yellow)
+        await require(`plugins/${enabledPlugins[i]}.js`).init()
+            .then( ()=> console.log(' - Done\n'.green) )
+    }
 }

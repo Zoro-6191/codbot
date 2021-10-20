@@ -56,13 +56,18 @@
     "messages":
     {
         // cmd_xlrstats: Configure the message when someone use !xlrstats
-        // Available placeholders:
+        //           Available placeholders:
         //                       %name%       - player name
         //                       %kills%      - player kills
         //                       %deaths%     - player deaths
         //                       %teamkills%  - teamkills made by the player
         //                       %ratio%      - kill/death ratio
         //                       %skill%      - player skill
+
+        "cmd_err_plr_notreg": "^1%name% ^7hasn't registered",
+        "cmd_err_self_notreg": "You need to be registered to use that command. Type ^3!register",
+        "cmd_err_statshidden": "That player's XLR Stats are ^1Hidden",
+
         "cmd_xlrstats": "^3XLR Stats: ^7%name% ^7: K ^2%kills% ^7D ^3%deaths% ^7TK ^1%tk% ^7Ratio ^5%ratio% ^7Skill ^3%skill%",
         "cmd_xlrtopstats": "^3# $number: ^7%name% ^7: Skill ^3%skill% ^7Ratio ^5%ratio% ^7Kills: ^2%kills%"
     },

@@ -1,7 +1,8 @@
 // this file parses each line and makes use outta em
 // events appear to be the best option for independent and togglable plugins
-const ErrorHandler = require.main.require('./src/errorhandler')
-const eventhandler = require.main.require('./src/eventhandler')
+require('rootpath')()
+const ErrorHandler = require('src/errorhandler')
+const eventhandler = require('src/eventhandler')
 
 // TO-DO: exception handling
 module.exports = 
@@ -61,13 +62,13 @@ async function parseLine( line )
                 return;
 
             case 'D':
-                // event: damage, guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
+                // event damage: guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
                 // TO-DO: emit suicide event
                 eventhandler.player.emit( 'damage', guid, slot, line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
                 return;
             
             case 'K':
-                // event: kill, guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
+                // event kill: guid, slot, team, name, att_guid, att_slot, att_team, att_name, weap, dmg, MeansOfDeath, hitloc
                 // TO-DO: emit tk event
                 eventhandler.player.emit( 'kill', guid, slot, line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], line[12] )
                 return;
